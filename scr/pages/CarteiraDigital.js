@@ -38,12 +38,9 @@ const CLIENT_ID =
   const [statusResponse, setStatusResponse] = useState('');
   const [walletResponse, setWalletResponse] = useState('');
 
-  const [digitalWalletOptions, setDigitalWalletOptions] = useState([]);
-
-  const actionButton = [
-    {textButton: 'ENVIAR TRANSAÇÃO',onPress: () => sendTransition()},
-    {textButton: 'CANCELAR TRANSAÇÃO',onPress: () => sendCancelTransition() },
-  ];
+  useEffect(() => {
+    authenticate();
+  }, []);
 
   const walletProviders = [
     {
@@ -52,6 +49,14 @@ const CLIENT_ID =
       onPress: () => setSelecteProvider('shipay'),
     },
   ];
+
+  const [digitalWalletOptions, setDigitalWalletOptions] = useState([]);
+
+  const actionButton = [
+    {textButton: 'ENVIAR TRANSAÇÃO', onPress: () => sendTransition()},
+    {textButton: 'CANCELAR TRANSAÇÃO', onPress: () => sendCancelTransition()},
+  ];
+
   async function authenticate() {
     const body = {
       access_key: ACCESS_KEY,
@@ -306,6 +311,7 @@ return (
             </TouchableOpacity>
         </View>
     </View>
+    <Footer/>
   </View>
   );
  };
@@ -342,21 +348,21 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     borderColor: 'black',
     flexDirection: 'column',
-    marginBottom:20,
+    marginBottom:10,
   },
   walletButtonOptionView: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 20,
+    marginBottom: 8,
   },
   walletOptionButton: {
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderRadius: 15,
-    minWidth: 100,
+    width:'30%',
     height: 35,
-    marginRight: 10,
+    marginRight: 5,
   },
   buttonText: {
     fontSize: 10,
@@ -381,7 +387,7 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     justifyContent:'space-between',
     width:'100%',
-    marginBottom:5,
+    marginBottom:3,
 
   },
   actionButtonStyle: {
@@ -393,7 +399,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sellButtonView:{
-
   },
   sellButtonStyle:{
     width: '100%',
@@ -402,6 +407,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     justifyContent: 'center',
+    marginBottom:10,
 
   },
   textButton: {
