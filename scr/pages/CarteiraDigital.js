@@ -17,6 +17,11 @@ import Footer from '../components/Footer';
 import { back } from 'react-native/Libraries/Animated/Easing';
 import { version } from 'react';
  
+const ACCESS_KEY = 'HV8R8xc28hQbX4fq_jaK1A';
+const SECRET_KEY =
+  'ZBD0yR5ybNuHPKqvH0YEiL-hXzfsd4mbot5NuZQ75ZqpMFVuTN__mkFnbl7E6QbXYhVlohnBQ7GQaoLckrrmAA';
+const CLIENT_ID =
+  '8HMB1egUeKI-h9s4I3gU_w1R6kYifrUfZRrauhvjvX9y2bVoBdpoH7vVm3FZOfFejKB-rEIRjVHBEQxrW93iE40ljPwcVEgfZnKN5SvObHxHvXrgfg87A7aUOeWroajczHNt6KUOwB4-YH90RidhzIJhQ0GEjKwpQt93XJeC1XE';
 
 
  
@@ -36,8 +41,8 @@ import { version } from 'react';
   const [digitalWalletOptions, setDigitalWalletOptions] = useState([]);
 
   const actionButton = [
-    {textButton: 'ENVIAR TRANSAÇÃO',},
-    {textButton: 'CANCELAR TRANSAÇÃO', },
+    {textButton: 'ENVIAR TRANSAÇÃO',onPress: () => sendTransition()},
+    {textButton: 'CANCELAR TRANSAÇÃO',onPress: () => sendCancelTransition() },
   ];
 
   const walletProviders = [
@@ -47,6 +52,172 @@ import { version } from 'react';
       onPress: () => setSelecteProvider('shipay'),
     },
   ];
+  async function authenticate() {
+    const body = {
+      access_key: ACCESS_KEY,
+      secret_key: SECRET_KEY,
+      client_id: CLIENT_ID,
+    };
+    try {
+      const res = await fetch('https://api-staging.shipay.com.br/pdvauth', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
+      console.log('AUTENTICAÇÃO');
+      const json = await res.json();
+      setAccessToken(json.access_token);
+      getWallets(json.access_token);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function getWallets(token) {
+    try {
+      const res = await fetch('https://api-staging.shipay.com.br/wallets', {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+        method: 'GET',
+      });
+      const json = await res.json();
+      console.log('GET WALLETS');
+      const wallets = [
+        ...json.wallets.map(wallet => ({
+          id: wallet.name,
+          textButton: wallet.name,
+          onPress: () => setSelectedWallet(wallet.name),
+        })),
+      ];
+      setDigitalWalletOptions(wallets);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function sendTransition() {
+    const valorAsFloat = parseFloat(valor.replace(',', '.'));
+    const body = {
+      order_ref: 'shipaypag-stg-005',
+      wallet: selectedWallet,
+      total: valorAsFloat,
+      items: [
+        {
+          item_title: 'Cerveja Heineken',
+          unit_price: valorAsFloat,
+          quantity: 1,
+        },
+      ],
+      buyer: {
+        first_name: 'Shipay',
+        last_name: 'PDV',
+        cpf: '000.000.000-00',
+        email: 'shipaypagador@shipay.com.br',
+        phone: '+55 11 99999-9999',
+      },
+    };
+    const res = await fetch('https://api-staging.shipay.com.br/order', {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + accessToken,
+      },
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    const json = await res.json();
+    console.log('PEDIDO DE COMPRA');
+    setImage64(json.qr_code);
+
+    const date = new Date();
+    const formattedDate =
+      date.getDate() +
+      '/' +
+      (date.getMonth() + 1) +
+      '/' +
+      date.getFullYear() +
+      ' ' +
+      date.getHours().toString().padStart(2, '0') +
+      ':' +
+      date.getMinutes().toString().padStart(2, '0') +
+      ':' +
+      date.getSeconds().toString().padStart(2, '0');
+
+    setLastOrderId(json.order_id);
+    setDataResponse(formattedDate);
+    setStatusResponse(json.status);
+    setWalletResponse(json.wallet);
+  }
+
+  function sendCancelTransition() {
+    Alert.alert(
+      'CANCELAMENTO DE TRANSAÇÃO',
+      'Deseja cancelar sua última venda?',
+      [
+        {
+          text: 'Sim',
+          onPress: () => doCancelTransition(),
+        },
+        {
+          text: 'Não',
+        },
+      ],
+    );
+  }
+
+  async function doCancelTransition() {
+    const res = await fetch(
+      `https://api-staging.shipay.com.br/order/${lastOrderId}`,
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + accessToken,
+        },
+        method: 'DELETE',
+      },
+    );
+    const json = await res.json();
+    console.log('VENDA CANCELADA');
+    setStatusResponse(json.status);
+  }
+
+  async function sendStatusVenda() {
+    const res = await fetch(
+      `https://api-staging.shipay.com.br/order/${lastOrderId}`,
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + accessToken,
+        },
+        method: 'GET',
+      },
+    );
+    const json = await res.json();
+    console.log('STATUS VENDA');
+    setStatusResponse(json.status);
+  }
+
+  function formattedStatus() {
+    if (statusResponse === '') {
+      return '';
+    }
+    const traducoes = {
+      approved: 'Aprovado',
+      expired: 'Expirado',
+      cancelled: 'Cancelado',
+      refunded: 'Devolvido',
+      pending: 'Pendente',
+    };
+    return traducoes[statusResponse];
+  }
+
  
 return (
   <View style={styles.mainView}>
@@ -92,6 +263,33 @@ return (
             value={valor}
           />
         </View>
+
+        <View style={styles.returnView}>
+          {lastOrderId !== '' && (
+            <>
+              <Image
+                style={{
+                  width: 220,
+                  height: 220,
+                  resizeMode: 'contain',
+                  alignSelf: 'center',
+                }}
+                source={{uri: image64}}
+              />
+              <View>
+                <Text style={styles.labelText}>
+                  Data da Venda: {dataResponse}
+                </Text>
+                <Text style={styles.labelText}>Valor: R$ {valor}</Text>
+                <Text style={styles.labelText}>
+                  Status: {formattedStatus()}
+                </Text>
+                <Text style={styles.labelText}>Carteira: {walletResponse}</Text>
+              </View>
+            </>
+          )}
+        </View>          
+
         <View style={styles.actionButtonsView}>
           {actionButton.map(({textButton, onPress}, index) => (
             <TouchableOpacity
@@ -103,7 +301,7 @@ return (
           ))}
         </View>
         <View style={styles.sellButtonView}>
-            <TouchableOpacity style={styles.sellButtonStyle}>
+            <TouchableOpacity style={styles.sellButtonStyle} onPress={() => sendStatusVenda()} >
               <Text style={styles.textButton}>STATUS DA VENDA </Text>
             </TouchableOpacity>
         </View>
@@ -137,13 +335,14 @@ const styles = StyleSheet.create({
     
   },
   returnView: {
-    width: '50%',
-    height: '100%',
+    width: '100%',
+    height: '60%',
     padding: 15,
     borderWidth: 3,
     borderRadius: 7,
     borderColor: 'black',
     flexDirection: 'column',
+    marginBottom:20,
   },
   walletButtonOptionView: {
     flexDirection: 'row',
