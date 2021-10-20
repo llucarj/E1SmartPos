@@ -45,6 +45,10 @@ const CLIENT_ID =
     {textButton: 'CANCELAR TRANSAÇÃO',onPress: () => sendCancelTransition() },
   ];
 
+  useEffect(() => {
+    authenticate();
+  }, []);
+
   const walletProviders = [
     {
       id: 'shipay',
