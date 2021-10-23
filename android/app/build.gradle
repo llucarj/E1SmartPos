@@ -197,19 +197,20 @@ dependencies {
 
     //LIBS ADDED TO PROJECT E1 EXPERIENCE
     implementation(name: 'e1-v1.0.6-release', ext: 'aar')
+    implementation(name: 'minipdvm8', ext: 'aar')
     implementation(name: 'cloudpossdk-s-1.0.2', ext: 'aar')
     implementation(name: 'InterfaceAutomacao-v2.0.0.8', ext: 'aar')
+    implementation 'org.apache.commons:commons-lang3:3.9'
 
     //BARCODE LIBS
     implementation('com.journeyapps:zxing-android-embedded:4.2.0')
     implementation 'com.google.zxing:core:3.4.0'
 
-    // Network (Digital Wallet)
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation 'com.github.felHR85:UsbSerial:4.5.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
-    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
-    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
 
     //Scanner
     implementation(name: 'scanner', ext: 'aar')

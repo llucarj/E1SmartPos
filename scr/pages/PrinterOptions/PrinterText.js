@@ -1,4 +1,4 @@
-import React,{ useState} from 'react';
+import React,{ useEffect, useState} from 'react';
 import {View, Text, StyleSheet,TextInput, TouchableOpacity, Alert} from 'react-native';
 
 import CheckBox from '@react-native-community/checkbox';
@@ -6,6 +6,11 @@ import RadioForm from 'react-native-simple-radio-button';
 import {Picker} from '@react-native-picker/picker';
  
 import Header from '../../components/Header';
+
+import PrinterService from '../../services/service_printer';
+
+import XmlNFCe from '../../services/service_xmlNFCe';
+import XmlSAT from '../../services/service_xmlSAT';
 
 const alignTextOptionData = [
     {
@@ -22,7 +27,10 @@ const alignTextOptionData = [
     }
 ];
 
-const PrinterText = () =>{
+const PrinterText = ({route}) =>{
+
+    var printerService = new PrinterService();
+    
 
     const [text, setText] = useState("ELGIN DEVELOPER COMMNUNITY");
     const [selectedFontFamily, setSelectedFontFamily] = useState('FONT A');
@@ -32,7 +40,8 @@ const PrinterText = () =>{
     const [isBold,setIsBold]=useState(false);
     const [isUnderline,setIsUnderline]=useState(false);
     const [isCutPaperActive,setIsCutPaperActive]=useState(false);
-
+    
+    
     const checkBoxType = [
         {id:'NEGRITO', textButton: 'NEGRITO', value:isBold ,setValue: (value) => setIsBold(value)},
         {id:'SUBLINHADO', textButton: 'SUBLINHADO', value: isUnderline ,setValue: (value) =>setIsUnderline(value)},
@@ -40,12 +49,56 @@ const PrinterText = () =>{
     ]
 
     const buttonOptionRender=[
-        {id:'NFCE', textButton: 'NFCE', },
-        {id:'SAT', textButton: 'SAT', },
+        {id:'NFCE', textButton: 'NFCE',onPress:()=>doPrinterXmlNFCe() },
+        {id:'SAT', textButton: 'SAT',onPress:()=>doPrinterXmlSAT() },
     ]  
 
     function doPrinterText(){
-        Alert.alert("Alerta","Imprimindo!");
+        if(text === ''){
+            Alert.alert("Alerta", "Campo mensagem vazio!");
+        }else{
+            printerService.sendPrinterText(
+                text,
+                optionTextAlign,
+                isBold,
+                isUnderline,
+                selectedFontFamily,
+                parseInt(selectedFontSize),
+            );
+            printerService.jumpLine(10);
+
+            if(route.params.conectionType==="extern"){
+                if(isCutPaperActive) printerService.cutPaper(10);
+            }
+        }
+
+    
+
+    }
+
+    function doPrinterXmlNFCe(){
+        var xml_nfce = new XmlNFCe();
+        var xmlNFCE = xml_nfce.getXmlNFCe();
+
+        printerService.sendPrinterNFCe(xmlNFCE, 1, "CODIGO-CSC-CONTRIBUINTE-36-CARACTERES", 0);
+
+        printerService.jumpLine(10);
+        if(route.params.conectionType==="extern"){
+            if(isCutPaperActive) printerService.cutPaper(10);
+        }
+    }
+
+    function doPrinterXmlSAT(){
+        var xml_sat = new XmlSAT();
+        
+        printerService.sendPrinterSAT(
+            xml_sat.getXmlSAT(),
+            0,
+        );
+        
+        if(route.params.conectionType==="extern"){
+            if(isCutPaperActive) printerService.cutPaper(10);
+        }
     }
 
     return(
@@ -116,7 +169,7 @@ const PrinterText = () =>{
                                 {checkBoxType.map(({id,textButton,value,setValue}, index)=>(
                                     <View key={index} style={styles.checkBoxStyleView}>
                                         <CheckBox
-                                        disabled={false}
+                                        disabled={id==="CUT-PAPER"&& route.params.conectionType ==="intern"? true:false}
                                         value={value}
                                         onValueChange={(newValue) => setValue(newValue)}
                                         />

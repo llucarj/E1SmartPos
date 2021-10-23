@@ -2,6 +2,7 @@ package com.e1smartpos;
 
 import android.app.Activity;
 import android.content.Context;
+import android.widget.Toast;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
@@ -12,17 +13,19 @@ import com.facebook.react.bridge.ReadableMap;
 import java.io.File;
 import java.util.Map;
 
+//import javax.print.DocFlavor.STRING;
+
 public class Printer{
     private static Activity mActivity;
 
     public Printer(Activity activity){
-        this.mActivity = activity;
-        Termica.setContext(this.mActivity);
+        Printer.mActivity = activity;
+        Termica.setContext(Printer.mActivity);
     }
 
     public static int printerInternalImpStart(){
         printerStop();
-        int result = Termica.AbreConexaoImpressora(6, "M8", "", 0);
+        int result = Termica.AbreConexaoImpressora(5, "SmartPOS", "", 0);
         return result;
     }
 
@@ -87,6 +90,8 @@ public class Printer{
         if((boolean) map.getBoolean("isBold")){
             styleValue+= 8;
         }
+
+        System.out.println("Texto:"+text+"Alinhamento:"+String.valueOf(alignValue)+"Style:"+String.valueOf(styleValue)+"Tamanho:"+String.valueOf(fontSize));
 
         result = Termica.ImpressaoTexto(text, alignValue, styleValue, fontSize);
         return result;
@@ -231,5 +236,12 @@ public class Printer{
     public static int statusSensorPapel(){
         return Termica.StatusImpressora(3);
     }
+
+    public static int statusSensorPapelSmartPOS(){ return Termica.StatusImpressora(0); }
+
+    //public static void mostrarRetorno() {
+     //   Toast.makeText(mActivity, "Teste",Toast.LENGTH_SHORT).show();
+    //}
+
 }
 
