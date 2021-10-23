@@ -12,9 +12,12 @@ import {
   import Header from '../components/Header'
   import Footer from '../components/Footer'
 
+  import BarCodeService from '../services/service_barCode';
 
  
  const BarCodes =()=> {
+
+  var serviceBarCode = new(BarCodeService);
   const inputOne = useRef();
   const inputTwo = useRef();
   const inputThree = useRef();
@@ -105,7 +108,7 @@ import {
                   />
                 </View>    
               </View>
-              <TouchableOpacity style={styles.submitionButton}>
+              <TouchableOpacity style={styles.submitionButton} onPress={()=>serviceBarCode.runReadCode()}>
                 <Text style={styles.textButton}>
                     REALIZAR LEITURA DE CÓDIGO DE BARRAS
                 </Text>
