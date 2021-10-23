@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity,Image} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity,Image, Alert} from 'react-native';
 
 import CheckBox from '@react-native-community/checkbox';
 import {launchImageLibrary} from 'react-native-image-picker';
@@ -8,7 +8,10 @@ import Logo from '../../icons/ElginDeveloperCommunity.png';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
-const PrinterImage = () =>{
+import PrinterService from '../../services/service_printer';
+
+const PrinterImage = ({route}) =>{
+    var printerService = new PrinterService();
     // Variáveis de Entrada
     const [isCutPaperActive,setIsCutPaperActive]=useState(false);
     const [image,setImage]=useState("");
@@ -18,14 +21,12 @@ const PrinterImage = () =>{
     const chooseImage = (type) => {
         let options = {
           mediaType: type,
-          maxWidth: 300,
-          maxHeight: 550,
+          maxWidth: 250,
+          maxHeight: 350,
           quality: 1,
         };
 
-        launchImageLibrary(options, (response) => {
-        //   console.log('Response = ', response);
-    
+        launchImageLibrary(options, (response) => {    
           if (response.didCancel) {
             alert('NÃO FOI ESCOLHIDO NENHUMA IMAGEM');
             return;
@@ -39,11 +40,36 @@ const PrinterImage = () =>{
             alert(response.errorMessage);
             return;
           }
-          console.log(response);
-          setImage(response);            
-          setPathImage(response.uri);
+          setImage(response.assets);
+          response.assets.map(({uri})=>{
+              return (setPathImage(uri));
+          });
+          
         });
     };
+
+    function doPrinterImage(){
+        //REALIZA A LIMPEZA DO URI PADRÃO REMOVENDO A PARTE INICIAL
+        var newPathImage = pathImage.split('file://')[1];
+
+        //SE NENHUMA IMAGEM FOI SELECIONADA NO DISPOSITIVO
+        //ENVIA INFORMAÇÃO PARA IMPRIMIR IMAGEM PADRÃO DO APP - elgin.jpg
+        if(pathImage === ''){
+            printerService.sendPrinterImage(
+                'elgin',
+                false,
+            );
+        }else{
+            printerService.sendPrinterImage(
+                newPathImage,
+                false,
+            );
+        }
+
+        printerService.jumpLine(10);
+        if(isCutPaperActive) printerService.cutPaper(10);
+    };
+
 
     return(
         <View style={styles.mainView}>
@@ -71,7 +97,7 @@ const PrinterImage = () =>{
                 <View style={styles.imageStyleOptionsView}>
                     <View style={styles.checkBoxStyleView}>
                         <CheckBox
-                            disabled={false}
+                            disabled={route.params.conectionType==="intern"? true:false}
                             value={isCutPaperActive}
                             onValueChange={(newValue) => setIsCutPaperActive(newValue)}
                         />
@@ -83,7 +109,7 @@ const PrinterImage = () =>{
                 <TouchableOpacity style={styles.actionButton} onPress={() => chooseImage('photo')}>
                     <Text style={styles.textButton} >SELECIONAR</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton }  >
+                <TouchableOpacity style={styles.actionButton } onPress={() => doPrinterImage()}  >
                     <Text style={styles.textButton}>IMPRIMIR</Text>
                 </TouchableOpacity>
             </View>
@@ -137,9 +163,9 @@ const styles = StyleSheet.create({
     },
     uploadedImageView:{
         alignItems:'center',
-        height:150,
+        height:180,
         justifyContent:'center',
-        marginVertical:20,
+        marginVertical:15,
     },
     imageZone:{
         width:300,

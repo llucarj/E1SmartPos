@@ -42,6 +42,10 @@ const CLIENT_ID =
     authenticate();
   }, []);
 
+  useEffect(() => {
+    authenticate();
+  }, []);
+
   const walletProviders = [
     {
       id: 'shipay',
@@ -113,7 +117,7 @@ const CLIENT_ID =
       total: valorAsFloat,
       items: [
         {
-          item_title: 'Cerveja Heineken',
+          item_title: 'Produto Teste',
           unit_price: valorAsFloat,
           quantity: 1,
         },

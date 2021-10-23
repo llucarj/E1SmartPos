@@ -8,29 +8,108 @@ import {Picker} from '@react-native-picker/picker';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
-const alignTextOptionData = [
-    {
-        label: 'ESQUERDA',
-        value: 'Esquerda'
-    },
-    {
-        label: 'CENTRALIZADO',
-        value: 'Centralizado'
-    },
-    {
-        label: 'DIREITA',
-        value: 'Direita'
-    }
-];
+import PrinterService from '../../services/service_printer';
 
-const PrinterBarCode = () =>{
 
+
+const PrinterBarCode = ({route}) =>{
+
+    var printerService = new PrinterService();
     const [codigo, setCodigo] = useState("40170725");
     const [selectedCodeType, setSelectedCodeType] = useState('EAN 8');
     const [selectedHeigthCode, setSelectedHeigthCode] = useState(20);
     const [selectedCodeWidth, setSelectedCodeWidth] = useState(1);
     const [optionTextAlign,setOptionTextAlign]=useState("Esquerda");
     const [isCutPaperActive,setIsCutPaperActive]=useState(false);
+
+    const alignTextOptionData = [
+        {
+            label: 'ESQUERDA',
+            value: 'Esquerda'
+        },
+        {
+            label: 'CENTRALIZADO',
+            value: 'Centralizado'
+        },
+        {
+            label: 'DIREITA',
+            value: 'Direita'
+        }
+    ];
+    
+    
+    function doAllTypesOfBarCodes(){
+        if(codigo === ''){
+            Alert.alert("Alert!", "Campo código vazio!");
+        }else{
+            if(selectedCodeType === "QR CODE"){
+                doPrinterQrCode();
+            }else{
+                doPrinterBarCodeDefault();
+            }
+        }
+    };
+    
+    function setTypeCodeMessage(typeActual){
+        switch(typeActual){
+            case "EAN 8":
+                setCodigo("40170725");
+                break;
+            case "EAN 13":
+                setCodigo("0123456789012");
+                break;
+            case "QR CODE":
+                setCodigo("ELGIN DEVELOPERS COMMUNITY");
+                break;
+            case "UPC-A":
+                setCodigo("123601057072");
+                break;
+            case "UPC-E":
+                setCodigo("1234567"); 
+                break;
+            case "CODE 39":
+                setCodigo("*ABC123*");
+                break;
+            case "ITF":
+                setCodigo("05012345678900");
+                break;
+            case "CODE BAR":
+                setCodigo("A3419500A");
+                break;
+            case "CODE 93":
+                setCodigo("ABC123456789"); 
+                break;
+            case "CODE 128":
+                setCodigo("{C1233");
+                break;
+        }
+    };
+    
+    function doPrinterBarCodeDefault(){
+        printerService.sendPrinterBarCode(
+            selectedCodeType,
+            codigo,
+            parseInt(selectedHeigthCode),
+            parseInt(selectedCodeWidth),
+            optionTextAlign,
+        );
+        printerService.jumpLine(10);
+        if(route.params.conectionType==="extern"){
+            if(isCutPaperActive) printerService.cutPaper(10);
+        }
+    };
+    
+    function doPrinterQrCode(){
+        printerService.sendPrinterQrCode(
+            parseInt(selectedCodeWidth),
+            codigo,
+            optionTextAlign,
+        );    
+        printerService.jumpLine(10);
+        if(route.params.conectionType==="extern"){
+            if(isCutPaperActive) printerService.cutPaper(10);
+        }
+    }
 
     
 
@@ -134,7 +213,7 @@ const PrinterBarCode = () =>{
                         )}
                         <View style={styles.checkBoxStyleView}>
                             <CheckBox
-                                disabled={false}
+                                disabled={route.params.conectionType==="intern"? true:false}
                                 value={isCutPaperActive}
                                 onValueChange={(newValue) => setIsCutPaperActive(newValue)}
                             />
@@ -144,7 +223,7 @@ const PrinterBarCode = () =>{
                     </View>
                 </View>
                 <View style={styles.printterButtonView}>
-                    <TouchableOpacity style={styles.printterButton}>
+                    <TouchableOpacity style={styles.printterButton} onPress={doAllTypesOfBarCodes}>
                         <Text style={styles.textButton}>
                             IMPRIMIR CÓDIGO DE BARRAS
                         </Text>
