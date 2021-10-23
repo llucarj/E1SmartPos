@@ -15,8 +15,8 @@ import Footer from '../components/Footer';
 
 
  
- const Menu =()=> {
-   const navigation = useNavigation();
+ const Menu =({navigation})=> {
+   
 
    const buttonsMenuData = [
     {icon: require('../icons/printer.png'), textButton: 'IMPRESSORA',onPress: () => navigation.navigate('Printer')},

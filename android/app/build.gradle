@@ -118,7 +118,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  * on project.ext.react, JavaScript will not be compiled to Hermes Bytecode
  * and the benefits of using Hermes will therefore be sharply reduced.
  */
-def enableHermes = project.ext.react.get("enableHermes", false);
+def enableHermes = project.ext.react.get("enableHermes", false)
 
 /**
  * Architectures to build native code for in debug.
@@ -193,7 +193,30 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+    //LIBS ADDED TO PROJECT E1 EXPERIENCE
+    implementation(name: 'e1-v1.0.6-release', ext: 'aar')
+    implementation(name: 'minipdvm8', ext: 'aar')
+    implementation(name: 'cloudpossdk-s-1.0.2', ext: 'aar')
+    implementation(name: 'InterfaceAutomacao-v2.0.0.8', ext: 'aar')
+    implementation 'org.apache.commons:commons-lang3:3.9'
+
+    //BARCODE LIBS
+    implementation('com.journeyapps:zxing-android-embedded:4.2.0')
+    implementation 'com.google.zxing:core:3.4.0'
+
+    implementation 'com.github.felHR85:UsbSerial:4.5.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+
+    //Scanner
+    implementation(name: 'scanner', ext: 'aar')
+
+    //startup
+    implementation("androidx.startup:startup-runtime:1.1.0")
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
@@ -209,7 +232,7 @@ dependencies {
     }
 
     if (enableHermes) {
-        def hermesPath = "../../node_modules/hermes-engine/android/";
+        def hermesPath = "../../node_modules/hermes-engine/android/"
         debugImplementation files(hermesPath + "hermes-debug.aar")
         releaseImplementation files(hermesPath + "hermes-release.aar")
     } else {
