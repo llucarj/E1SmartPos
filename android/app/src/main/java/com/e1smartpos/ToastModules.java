@@ -14,6 +14,9 @@ import java.util.HashMap;
 
 import android.app.Service;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.widget.Toast;
 import org.json.JSONException;
 
@@ -21,6 +24,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import static android.app.Activity.RESULT_OK;
@@ -39,6 +43,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import br.com.setis.interfaceautomacao.Operacoes;
 import com.elgin.e1.Scanner.Scanner;
 import com.e1smartpos.Printer;
+import com.e1smartpos.ElginPayService;
 
 public class ToastModules extends ReactContextBaseJavaModule implements ActivityEventListener {
     public static ReactApplicationContext reactContext;
@@ -57,6 +62,14 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
     }
 
     public void onNewIntent(Intent intent){}
+
+    private Handler handler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            String saida = (String) msg.obj;
+        }
+    };
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data){
@@ -149,68 +162,25 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
     }
 
     @ReactMethod
-    public void funcTest(ReadableMap configsReceived){
+
+    public void sendOptionElginPay(ReadableMap configsReceived){
         WritableMap result = Arguments.createMap();
 
-        System.out.println("FuncaoTeste");
 
-        if(configsReceived.getString("typePrinter").equals("printerConnectInternal")){
-            Printer.printerInternalImpStart();
+        if(configsReceived.getString("typeTransition").equals("creditTransaction")){
+            ElginPayService.IniciarPagamentoCredito(configsReceived,reactContext,handler);
 
-        }else if(configsReceived.getString("typePrinter").equals("connectPrinterExtern")){
-            Printer.printerExternalImpStart(configsReceived);
+        }else if(configsReceived.getString("typeTransition").equals("debitTransaction")){
+            ElginPayService.IniciarPagamentoDebito(configsReceived,reactContext,handler);
 
-        }else if(configsReceived.getString("typePrinter").equals("printerCupomTEF")){
-            Printer.imprimeCupomTEF(configsReceived);
+        }else if(configsReceived.getString("typeTransition").equals("admTransaction")){
+            ElginPayService.IniciarOperacaoAdministrativa(reactContext,handler);
 
-        }else if(configsReceived.getString("typePrinter").equals("printerText")){
-            Printer.imprimeTexto(configsReceived);
-
-        }else if(configsReceived.getString("typePrinter").equals("printerBarCode")){
-            Printer.imprimeBarCode(configsReceived);
-
-        }else if(configsReceived.getString("typePrinter").equals("printerBarCodeTypeQrCode")){
-            Printer.imprimeQR_CODE(configsReceived);
-
-        }else if(configsReceived.getString("typePrinter").equals("printerImage")){
-            Printer.imprimeImagem(configsReceived);
-
-        }else if(configsReceived.getString("typePrinter").equals("printerNFCe")){
-            Printer.imprimeXMLNFCe(configsReceived);
-
-        }else if(configsReceived.getString("typePrinter").equals("printerSAT")){
-            Printer.imprimeXMLSAT(configsReceived);
-
-        }else if(configsReceived.getString("typePrinter").equals("gavetaStatus")){
-            result.putString("statusGaveta", String.valueOf(Printer.statusGaveta()));
-
-            reactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit("eventStatusGaveta", result);
-
-        }else if(configsReceived.getString("typePrinter").equals("abrirGaveta")){
-            Printer.abrirGaveta();
-
-        }else if(configsReceived.getString("typePrinter").equals("jumpLine")){
-            Printer.AvancaLinhas(configsReceived);
-
-        }else if(configsReceived.getString("typePrinter").equals("cutPaper")){
-            Printer.cutPaper(configsReceived);
-
-        }else if(configsReceived.getString("typePrinter").equals("statusPrinter")){
-            result.putString("statusPrinter", String.valueOf(Printer.statusSensorPapel()));
-
-            reactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit("eventStatusPrinter", result);
-        } else if (configsReceived.getString("typePrinter").equals("statusPosPrinter")){
-            result.putString("statusPosPrinter",String.valueOf(Printer.statusSensorPapelSmartPOS()));
-            reactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit("eventPosPrinter", result);
-
+        }else if(configsReceived.getString("typeTransition").equals("cancelTransaction")){
+            ElginPayService.IniciarCancelamentoVenda(configsReceived,reactContext,handler);
         }
     }
+
 
     
 }

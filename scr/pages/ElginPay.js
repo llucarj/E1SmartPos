@@ -12,11 +12,13 @@ import {
 } from 'react-native';
 
 import { DeviceEventEmitter } from 'react-native';
+import ElginPayService from '../services/service_elginpay';
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
 const ElginPay =()=>{
+  var elginPay = new ElginPayService();
 
   const [ selectedOptionTEF, setSelectedOptionTEF ] = useState("");
 
@@ -30,7 +32,7 @@ const ElginPay =()=>{
   const [ numParcelas, setnumParcelas ] = useState("1");
   const [ numIP, setNumIP ] = useState("192.168.0.00");
   const [ paymentMeth,  setPaymentMeth ] = useState("Crédito");
-  const [ installmentType, setInstallmentType ] = useState("Avista");
+  const [ installmentType, setInstallmentType ] = useState("0");
 
   const numIPRef = useRef(null);
   var isFirstTime = true;
@@ -43,25 +45,50 @@ const ElginPay =()=>{
   const buttonsPayment = [
       {id:'Crédito', icon: require('../icons/card.png'), textButton: 'CRÉDITO',onPress:() => setPaymentMeth('Crédito')},
       {id:'Débito', icon: require('../icons/card.png'), textButton: 'DÉBITO',onPress:() => setPaymentMeth('Débito')},
-      {id:'Todos', icon: require('../icons/voucher.png'), textButton: 'TODOS',onPress:() => setPaymentMeth('Todos')},
   ];
 
   const buttonsInstallment = [
-      {id:'Loja', icon: require('../icons/store.png'), textButton: 'LOJA', onPress: ()=> setInstallmentType('Loja')},
-      {id:'Adm', icon: require('../icons/adm.png'), textButton: 'ADM ', onPress: ()=>setInstallmentType('Adm')},
-      {id:'Avista', icon: require('../icons/card.png'), textButton: 'A VISTA', onPress: ()=> setInstallmentType('Avista')},
+      {id:'2', icon: require('../icons/store.png'), textButton: 'LOJA', onPress: ()=> setInstallmentType('2')},
+      {id:'1', icon: require('../icons/adm.png'), textButton: 'ADM ', onPress: ()=>setInstallmentType('1')},
+      {id:'0', icon: require('../icons/card.png'), textButton: 'A VISTA', onPress: ()=> setInstallmentType('0')},
   ];
 
-  function changeTypeTEF(tefChoosed){
-    if(tefChoosed === "M-Sitef"){
-        if(installmentType === "Avista") setInstallmentType("Loja");
-        setTypeTEF("M-Sitef");
-        
-    }else{
-        setTypeTEF("PayGo");
-    }
-}
-  
+  function isEntriesValid(){
+      if((paymentMeth === "Crédito") && (parseInt(numParcelas)  > 0) && (valor!="" && parseInt(valor)>=1)){
+          return(true);
+      }
+      else if(paymentMeth==="Débito"&& parseInt(valor)>=1 ){
+        return(true);
+      }else{
+        Alert.alert("Entradas inválidas","Por favor, insira valores de entrada válidos!")
+      }
+  }
+
+  function sendActionTef(action){
+      if(isEntriesValid()){
+          sendElginPayParam(action);
+      }
+  }
+
+  function sendElginPayParam(action){
+      if(action ==="SALE"){
+          if(paymentMeth==="Crédito"){
+            elginPay.sendCreditPayment(valor,installmentType);
+          }else if (paymentMeth==="Débito"){
+            elginPay.sendDebitPayment(valor);
+          }
+      }
+
+      if(action ==="CANCEL"){
+          elginPay.sendCancelSell(valor);
+      }
+
+  }
+
+  function configElginPay(){
+      elginPay.sendAdmTransaction();
+  }
+
 return(
     <View style={styles.mainView}>
         <Header textTitle={'ELGIN PAY'}/>         
@@ -76,17 +103,16 @@ return(
                 value={valor}              
               />                        
             </View>
-            <View style={styles.inputView}>
+            {/*< View style={styles.inputView}>
                 <Text style={styles.labelText}>Nº PARCELAS:</Text>
                 <TextInput
                     placeholder={'00'}
                     style={styles.inputMensage}
-
                     keyboardType='numeric'
                     onChangeText={setnumParcelas}
                     value={numParcelas}              
                 />
-            </View>
+            </View>*/}
             <View marginBottom={15}>
               <View style={styles.paymentView}>
                   <Text style={styles.labelText}> FORMAS DE PAGAMENTO </Text>
@@ -103,31 +129,36 @@ return(
                     ))}
                   </View>
                 </View>
-                <View style={styles.paymentView}>
-                    <Text style={styles.labelText}> TIPO DE PARCELAMENTO </Text>
-                    <View style={styles.paymentsButtonView}>
-                        {buttonsInstallment.map(({id,icon,textButton,onPress}, index)=>(
-                            <TouchableOpacity 
-                                style={[styles.paymentButton, {borderColor: id===installmentType ? '#23F600':'black'}]} 
-                                key={index}
-                                onPress={onPress}
-                                disabled={id === "Avista" && typeTEF === "M-Sitef" ? true : false}
-                            >
-                                    <Image style={styles.icon} source={icon}/>
-                                    <Text style={styles.buttonText}>{textButton}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-              </View>
+                {paymentMeth !== "Débito" && (
+                    <>
+                        <View style={styles.paymentView}>
+                            <Text style={styles.labelText}> TIPO DE PARCELAMENTO </Text>
+                            <View style={styles.paymentsButtonView}>
+                                {buttonsInstallment.map(({id,icon,textButton,onPress}, index)=>(
+                                    <TouchableOpacity 
+                                        style={[styles.paymentButton, {borderColor: id===installmentType ? '#23F600':'black'}]} 
+                                        key={index}
+                                        onPress={onPress}
+                                        disabled={false}
+                                    >
+                                            <Image style={styles.icon} source={icon}/>
+                                            <Text style={styles.buttonText}>{textButton}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+                    </>
+                )}
+                
             </View>
             <View marginBottom={80}>
               <View style={styles.submitionButtonsView}>
-                  <TouchableOpacity style={styles.submitionButton} onPress={() => startActionTEF('SALE')} >
+                  <TouchableOpacity style={styles.submitionButton} onPress={() => sendActionTef('SALE')} >
                       <Text style={styles.textButton}>
                           ENVIAR TRANSAÇÃO
                       </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.submitionButton} onPress={() => startActionTEF('CANCEL')} >
+                  <TouchableOpacity style={styles.submitionButton} onPress={() => sendActionTef('CANCEL')} >
                       <Text style={styles.textButton}>
                           CANCELAR TRANSAÇÃO
                       </Text>
@@ -135,7 +166,7 @@ return(
               </View>
 
               <View style={styles.submitionButtonsView}>
-                  <TouchableOpacity style={styles.configButton} onPress={() => startActionTEF('CONFIGS')}>
+                  <TouchableOpacity style={styles.configButton} onPress={() => configElginPay()}>
                       <Text style={styles.textButton}>
                           CONFIGURAÇÃO
                       </Text>
