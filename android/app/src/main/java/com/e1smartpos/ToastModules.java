@@ -6,6 +6,9 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 //import javax.print.attribute.standard.PrinterInfo;
@@ -13,6 +16,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 import android.app.Service;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -89,6 +94,32 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
                 }
             }
         }
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1000) {
+                Uri returnUri = data.getData();
+                File file = new File(returnUri.getPath());//create path from uri
+                final String path = file.getPath();
+                Log.d("chooseImage_1", returnUri.toString());
+                Log.d("chooseImage_2", returnUri.getEncodedPath());
+                Log.d("chooseImage_3", returnUri.getLastPathSegment());
+                Log.d("chooseImage_4", returnUri.getScheme());
+                Log.d("chooseImage_5", returnUri.getPath());
+                Log.d("chooseImage_6", "" + returnUri.getHost());
+                Log.d("chooseImage_7", returnUri.getAuthority());
+                Log.d("chooseImage_8", "" +returnUri.getEncodedQuery());
+                Log.d("chooseImage_9", "" + returnUri.getQuery());
+                Log.d("chooseImage_10", "" + file.getPath());
+                Log.d("chooseImage_11", "" + file.getName());
+                Log.d("chooseImage_12", "" + file.toString());
+                Log.d("chooseImage_13", "" + file.getAbsolutePath());
+                reactContext
+                        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                        .emit("eventChoosePrinterImage", path);
+            }
+        } else {
+            Toast.makeText(reactContext, "You haven't picked an Image", Toast.LENGTH_LONG).show();
+        }
     }
 
     @ReactMethod
@@ -121,9 +152,12 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
         }else if(configsReceived.getString("typePrinter").equals("printerBarCodeTypeQrCode")){
             Printer.imprimeQR_CODE(configsReceived);
 
+        }else if(configsReceived.getString("typePrinter").equals("choosePrinterImage")){
+            Intent cameraIntent = new Intent(Intent.ACTION_PICK);
+            cameraIntent.setType("image/*");
+            reactContext.startActivityForResult(cameraIntent, 1000, null);
         }else if(configsReceived.getString("typePrinter").equals("printerImage")){
             Printer.imprimeImagem(configsReceived);
-
         }else if(configsReceived.getString("typePrinter").equals("printerNFCe")){
             Printer.imprimeXMLNFCe(configsReceived);
 
