@@ -70,7 +70,7 @@ const Printer = ({navigation}) => {
   ];
 
   useEffect(() => {
-    //startConnectPrinterIntern();
+    startConnectPrinterIntern();
   }, []);
 
   function actualStatusPrinter() {
@@ -138,7 +138,7 @@ const Printer = ({navigation}) => {
   function startConnectPrinterIntern() {
     setChecked('SMARTPOS');
     setPrinterConectionType('intern');
-    result = printerService.sendStartConnectionPrinterIntern();
+    printerService.sendStartConnectionPrinterIntern();
   }
 
   function startConnectPrinterExtern() {
