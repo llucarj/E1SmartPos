@@ -70,7 +70,7 @@ const Printer = ({navigation}) => {
   ];
 
   useEffect(() => {
-    //startConnectPrinterIntern();
+    startConnectPrinterIntern();
   }, []);
 
   function actualStatusPrinter() {

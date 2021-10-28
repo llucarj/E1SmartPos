@@ -149,7 +149,4 @@ export default class PrinterService {
     this.sendFunctionToAndroid(mapParam);
   }
 
-  funcaoTest() {
-    NativeModulesE1.funcTest();
-  }
 }
