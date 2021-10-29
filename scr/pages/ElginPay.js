@@ -173,8 +173,9 @@ return(
                   </TouchableOpacity>
               </View>
             </View>
-            <Footer/>
+            
       </View>
+      <Footer/>
     </View>
   );
 };

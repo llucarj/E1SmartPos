@@ -296,8 +296,8 @@ const CarteiraDigital = () => {
             <>
               <Image
                 style={{
-                  width: 220,
-                  height: 220,
+                  width: 200,
+                  height: 200,
                   resizeMode: 'contain',
                   alignSelf: 'center',
                 }}
@@ -363,15 +363,17 @@ const styles = StyleSheet.create({
     width: '90%',
     height: '80%',
     justifyContent: 'space-between',
+   
   },
   inputView: {
     width: '90%',
-    height: '85%',
+    height: '88%',
     padding: 1,
+
   },
   returnView: {
     width: '100%',
-    height: '60%',
+    height: '63%',
     padding: 15,
     borderWidth: 3,
     borderRadius: 7,
@@ -401,7 +403,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 5,
+   
   },
   inputValueStyle: {
     flexDirection: 'row',

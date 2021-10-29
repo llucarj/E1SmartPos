@@ -65,7 +65,7 @@ const PrinterBarCode = ({route}) =>{
                 setCodigo("123601057072");
                 break;
             case "CODE 39":
-                setCodigo("*ABC123*");
+                setCodigo("CODE39");
                 break;
             case "ITF":
                 setCodigo("05012345678900");
@@ -74,7 +74,7 @@ const PrinterBarCode = ({route}) =>{
                 setCodigo("A3419500A");
                 break;
             case "CODE 93":
-                setCodigo("ABC123456789"); 
+                setCodigo("CODE93"); 
                 break;
             case "CODE 128":
                 setCodigo("{C1233");
@@ -150,10 +150,10 @@ const PrinterBarCode = ({route}) =>{
                 </View>
                 <View style={styles.alignSettingPrinterView}>
                     <Text style={styles.labelText}>ALINHAMENTO:</Text>
-                    <View style={{width:'100%'}}> 
+                    <View style={{width:'80%'}}> 
                         <RadioForm
                             style={{marginVertical:13}}
-                            labelStyle={{marginHorizontal:13,fontWeight:'bold',fontSize:12}}
+                            labelStyle={{marginHorizontal:5,fontWeight:'bold',fontSize:12}}
                             radio_props={alignTextOptionData}
                             initial={0}
                             buttonSize={10}
