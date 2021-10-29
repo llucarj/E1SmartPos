@@ -12,9 +12,12 @@ import {
   import Header from '../components/Header'
   import Footer from '../components/Footer'
 
+  import ServiceScanner from '../services/service_scanner';
+
 
  
  const BarCodes =()=> {
+   var serviceScanner = new ServiceScanner();
   const inputOne = useRef();
   const inputTwo = useRef();
   const inputThree = useRef();
@@ -25,16 +28,14 @@ import {
  
   const [ firstInput, setFirstInput ] = useState("");
   const [ secondInput, setSecondInput ] = useState("");
-  const [ thirdInput, setTirthInput ] = useState("");
-  const [ fourthInput, setFourthInput ] = useState("");
-  const [ fifthInput, setFifthInput ] = useState("");
 
   function clearAllOfInputs(){
     setFirstInput("");
     setSecondInput("");
-    setTirthInput("");
-    setFourthInput("");
-    setFifthInput("");
+  }
+
+  function lerCodigo(){
+    serviceScanner.lerScanner();
   }
    return (
     <View style={styles.mainView}>
@@ -58,58 +59,27 @@ import {
                     <TextInput                                                                
                       returnKeyType="next"
                       ref={inputTwo}
-                      onSubmitEditing={() => inputThree.current.focus()}
                       blurOnSubmit={false}
                       editable={firstInput !== "" ? true : false}
                       style={styles.inputMensage}
                       onChangeText={setSecondInput}
                       value={secondInput}
                     />
-                </View>
-
-                <View style={styles.containerInputMessages}>
-                  <TextInput                                                                
-                    returnKeyType="next"
-                    ref={inputThree}
-                    onSubmitEditing={() => inputFour.current.focus()}                                
-                    blurOnSubmit={false}
-                    editable={secondInput !== "" ? true : false}
-                    style={styles.inputMensage}
-                    onChangeText={setTirthInput}
-                    value={thirdInput}
-                  />
-                </View>
-                <View style={styles.containerInputMessages}>
-                  <TextInput                                                                
-                    returnKeyType="next"
-                    ref={inputFour}
-                    onSubmitEditing={() => inputFive.current.focus()}                                
-                    blurOnSubmit={false}
-                    editable={thirdInput !== "" ? true : false}
-
-                    style={styles.inputMensage}
-                    onChangeText={setFourthInput}
-                    value={fourthInput}
-                  />
-                </View>                 
-                <View style={styles.containerInputMessages}>
-                  <TextInput                                                                
-                    returnKeyType="next"
-                    onSubmitEditing={() => inputSix.current.focus()}
-                    ref={inputFive}
-                    blurOnSubmit={false}
-                    editable={fourthInput !== "" ? true : false}
-                    style={styles.inputMensage}
-                    onChangeText={setFifthInput}
-                    value={fifthInput}
-                  />
-                </View>    
+                </View>   
               </View>
-              <TouchableOpacity style={styles.submitionButton}>
-                <Text style={styles.textButton}>
-                    REALIZAR LEITURA DE CÓDIGO DE BARRAS
-                </Text>
-              </TouchableOpacity>
+              <View style={styles.buttonsView}>
+                <TouchableOpacity style={styles.submitionButton} onPress={() => lerCodigo()}>
+                  <Text style={styles.textButton}>
+                      INICIAR LEITURA
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.submitionButton} onPress={() => clearAllOfInputs()}>
+                  <Text style={styles.textButton}>
+                      LIMPAR CAMPO
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              
           </View>
          
       </View>
@@ -143,10 +113,12 @@ import {
       fontSize:15,
   },
   buttonsView:{
-      flexDirection:'row',
+
+      flexDirection:'column',
       width:'100%',
       justifyContent:'space-between',
       alignItems:'center',
+    
   },
   submitionButton:{
       width:'100%',
@@ -155,6 +127,7 @@ import {
       alignItems:'center',
       borderRadius:20,
       justifyContent:'center',
+      marginBottom:5
   },
   mainBarCodesView:{
       alignItems:'center',
@@ -171,7 +144,7 @@ import {
       borderWidth:2,
       borderRadius:15,
       width:'100%',
-      height:'90%',
+      height:'50%',
       alignItems:'center',
       justifyContent:'center',
       marginBottom:10,

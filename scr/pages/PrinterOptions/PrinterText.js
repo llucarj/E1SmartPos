@@ -169,7 +169,8 @@ const PrinterText = ({route}) =>{
                                 {checkBoxType.map(({id,textButton,value,setValue}, index)=>(
                                     <View key={index} style={styles.checkBoxStyleView}>
                                         <CheckBox
-                                        disabled={id==="CUT-PAPER"&& route.params.conectionType ==="intern"? true:false}
+                                        disabled={id==="CUT-PAPER"&& route.params.conectionType ==="intern"? true:false || 
+                                                  id==="NEGRITO"&&selectedFontFamily==="FONT B"?true:false}
                                         value={value}
                                         onValueChange={(newValue) => setValue(newValue)}
                                         />

@@ -115,6 +115,7 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
         Activity thisActivity = getCurrentActivity();
         Intent in = Scanner.getScanner(thisActivity);
         thisActivity.startActivityForResult(in, 1);
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -188,18 +189,17 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
     public void sendOptionElginPay(ReadableMap configsReceived){
         WritableMap result = Arguments.createMap();
 
-
         if(configsReceived.getString("typeTransition").equals("creditTransaction")){
-            ElginPayService.IniciarPagamentoCredito(configsReceived,reactContext,handler);
+            ElginPayService.IniciarPagamentoCredito(configsReceived,reactContext.getCurrentActivity(),handler);
 
         }else if(configsReceived.getString("typeTransition").equals("debitTransaction")){
-            ElginPayService.IniciarPagamentoDebito(configsReceived,reactContext,handler);
+            ElginPayService.IniciarPagamentoDebito(configsReceived,reactContext.getCurrentActivity(),handler);
 
         }else if(configsReceived.getString("typeTransition").equals("admTransaction")){
-            ElginPayService.IniciarOperacaoAdministrativa(reactContext,handler);
+            ElginPayService.IniciarOperacaoAdministrativa(reactContext.getCurrentActivity(),handler);
 
         }else if(configsReceived.getString("typeTransition").equals("cancelTransaction")){
-            ElginPayService.IniciarCancelamentoVenda(configsReceived,reactContext,handler);
+            ElginPayService.IniciarCancelamentoVenda(configsReceived,reactContext.getCurrentActivity(),handler);
         }
     }
 
