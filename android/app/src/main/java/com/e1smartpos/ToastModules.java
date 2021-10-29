@@ -47,7 +47,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import br.com.setis.interfaceautomacao.Operacoes;
-import com.elgin.e1.Scanner.Scanner;
+import com.elgin.e1.Scanner.*;
 import com.e1smartpos.Printer;
 import com.e1smartpos.ElginPayService;
 
@@ -80,16 +80,25 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data){
         //IntentResult resultIntent = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-
+        WritableMap returnCode = Arguments.createMap();
         if (requestCode == 1) {
             if (resultCode == 2) {
                 String[] result = data.getStringArrayExtra("result");
 
                 CharSequence cs;
                 if (result[0].equals("1")) {
-                    cs = "Codigo: " + result[1] + "\nTipo: " + result[3];
+
+                    returnCode.putString("returnCode",result[1]);
+                    returnCode.putString("returnType",result[3]);
+                    reactContext
+                            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                            .emit("eventBarCodeReturn", returnCode);
 
                 } else {
+                    returnCode.putString("returnError",result[0]);
+                    reactContext
+                            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                            .emit("eventBarCodeReturn", returnCode);
                     cs = "Erro # " + result[0] + " na leitura do código.";
 
                 }

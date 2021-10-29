@@ -20,9 +20,6 @@ import {
    var serviceScanner = new ServiceScanner();
   const inputOne = useRef();
   const inputTwo = useRef();
-  const inputThree = useRef();
-  const inputFour = useRef();
-  const inputFive = useRef();
 
  
  
@@ -36,6 +33,26 @@ import {
 
   function lerCodigo(){
     serviceScanner.lerScanner();
+
+    let actualEvent = DeviceEventEmitter.addListener('eventBarCodeReturn', event => {
+      var codeReturn = event.returnCode;
+      var typeCodeReturn = event.returnType;
+      var errorCode = event.returnError;
+
+      if(!errorCode){
+        setFirstInput(codeReturn);
+        setSecondInput(typeCodeReturn);
+      } else{
+        Alert.alert('Error',"Erro no código: "+ errorCode +"na leitura do Código");
+      }
+
+      setTimeout(() => {
+        actualEvent.remove();
+    }, 2000)  
+     
+  })
+
+    
   }
    return (
     <View style={styles.mainView}>
