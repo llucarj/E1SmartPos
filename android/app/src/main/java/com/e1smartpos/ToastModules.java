@@ -101,19 +101,6 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
                 Uri returnUri = data.getData();
                 File file = new File(returnUri.getPath());//create path from uri
                 final String path = file.getPath();
-                Log.d("chooseImage_1", returnUri.toString());
-                Log.d("chooseImage_2", returnUri.getEncodedPath());
-                Log.d("chooseImage_3", returnUri.getLastPathSegment());
-                Log.d("chooseImage_4", returnUri.getScheme());
-                Log.d("chooseImage_5", returnUri.getPath());
-                Log.d("chooseImage_6", "" + returnUri.getHost());
-                Log.d("chooseImage_7", returnUri.getAuthority());
-                Log.d("chooseImage_8", "" +returnUri.getEncodedQuery());
-                Log.d("chooseImage_9", "" + returnUri.getQuery());
-                Log.d("chooseImage_10", "" + file.getPath());
-                Log.d("chooseImage_11", "" + file.getName());
-                Log.d("chooseImage_12", "" + file.toString());
-                Log.d("chooseImage_13", "" + file.getAbsolutePath());
                 reactContext
                         .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                         .emit("eventChoosePrinterImage", path);

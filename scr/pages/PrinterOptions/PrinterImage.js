@@ -44,15 +44,12 @@ const PrinterImage = ({route}) => {
   };
 
   function doPrinterImage() {
-    //REALIZA A LIMPEZA DO URI PADRÃO REMOVENDO A PARTE INICIAL
-    var newPathImage = pathImage.split('file://')[1];
-
     //SE NENHUMA IMAGEM FOI SELECIONADA NO DISPOSITIVO
     //ENVIA INFORMAÇÃO PARA IMPRIMIR IMAGEM PADRÃO DO APP - elgin.jpg
     if (pathImage === '') {
       printerService.sendPrinterImage('elgin', false);
     } else {
-      printerService.sendPrinterImage(newPathImage, false);
+      printerService.sendPrinterImage(pathImage, false);
     }
 
     printerService.jumpLine(10);
