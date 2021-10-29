@@ -6,26 +6,26 @@ import {
   View,
   TouchableOpacity,
   Image,
-  DeviceEventEmitter,
   Alert,
+  Linking,
+  ToastAndroid,
 } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import {TextInput} from 'react-native-gesture-handler';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { back } from 'react-native/Libraries/Animated/Easing';
-import { version } from 'react';
- 
+import {back} from 'react-native/Libraries/Animated/Easing';
+import {version} from 'react';
+
 const ACCESS_KEY = 'HV8R8xc28hQbX4fq_jaK1A';
 const SECRET_KEY =
   'ZBD0yR5ybNuHPKqvH0YEiL-hXzfsd4mbot5NuZQ75ZqpMFVuTN__mkFnbl7E6QbXYhVlohnBQ7GQaoLckrrmAA';
 const CLIENT_ID =
   '8HMB1egUeKI-h9s4I3gU_w1R6kYifrUfZRrauhvjvX9y2bVoBdpoH7vVm3FZOfFejKB-rEIRjVHBEQxrW93iE40ljPwcVEgfZnKN5SvObHxHvXrgfg87A7aUOeWroajczHNt6KUOwB4-YH90RidhzIJhQ0GEjKwpQt93XJeC1XE';
 
-
- 
- const CarteiraDigital =()=> {
+const CarteiraDigital = () => {
   const [accessToken, setAccessToken] = useState('');
   const [lastOrderId, setLastOrderId] = useState('');
 
@@ -36,14 +36,13 @@ const CLIENT_ID =
   const [image64, setImage64] = useState('');
   const [dataResponse, setDataResponse] = useState('');
   const [statusResponse, setStatusResponse] = useState('');
-  const [walletResponse, setWalletResponse] = useState('');
 
-  const [digitalWalletOptions, setDigitalWalletOptions] = useState([]);
+  const [orderResponse, setOrderResponse] = useState({});
+  const [showBtnPixDeepLink, setShowBtnPixDeepLink] = useState(false);
 
-  const actionButton = [
-    {textButton: 'ENVIAR TRANSAÇÃO',onPress: () => sendTransition()},
-    {textButton: 'CANCELAR TRANSAÇÃO',onPress: () => sendCancelTransition() },
-  ];
+  useEffect(() => {
+    authenticate();
+  }, []);
 
   useEffect(() => {
     authenticate();
@@ -56,6 +55,15 @@ const CLIENT_ID =
       onPress: () => setSelecteProvider('shipay'),
     },
   ];
+
+  const [digitalWalletOptions, setDigitalWalletOptions] = useState([]);
+
+  const actionButton = [
+    {textButton: 'ENVIAR TRANSAÇÃO', onPress: () => sendTransition()},
+    {textButton: 'CANCELAR TRANSAÇÃO', onPress: () => sendCancelTransition()},
+    {textButton: 'STATUS DA VENDA', onPress: () => sendStatusVenda()},
+  ];
+
   async function authenticate() {
     const body = {
       access_key: ACCESS_KEY,
@@ -155,7 +163,13 @@ const CLIENT_ID =
     setLastOrderId(json.order_id);
     setDataResponse(formattedDate);
     setStatusResponse(json.status);
-    setWalletResponse(json.wallet);
+    setOrderResponse(json);
+
+    if (json.wallet == 'pix' || json.wallet == 'mercadopago') {
+      setShowBtnPixDeepLink(true);
+    } else {
+      setShowBtnPixDeepLink(false);
+    }
   }
 
   function sendCancelTransition() {
@@ -208,9 +222,18 @@ const CLIENT_ID =
     setStatusResponse(json.status);
   }
 
+  async function onPressBtnPixDeepLink() {
+    if (orderResponse.wallet === 'pix') {
+      Clipboard.setString(orderResponse.qrCodeText);
+      ToastAndroid.show('PIX COPIADO!', ToastAndroid.SHORT);
+    } else if (orderResponse.wallet === 'mercadopago') {
+      Linking.openURL(orderResponse.deep_link);
+    }
+  }
+
   function formattedStatus() {
     if (statusResponse === '') {
-      return '';
+      return 'Desconhecido';
     }
     const traducoes = {
       approved: 'Aprovado',
@@ -218,28 +241,28 @@ const CLIENT_ID =
       cancelled: 'Cancelado',
       refunded: 'Devolvido',
       pending: 'Pendente',
+      refund_pending: 'Estorno Pendente',
     };
     return traducoes[statusResponse];
   }
 
- 
-return (
-  <View style={styles.mainView}>
-      <Header textTitle = "CARTEIRA DIGITAL" /> 
+  return (
+    <View style={styles.mainView}>
+      <Header textTitle="CARTEIRA DIGITAL" />
       <View style={styles.inputView}>
         <View style={styles.walletButtonOptionView}>
           {walletProviders.map(({id, textButton, onPress}, index) => (
             <TouchableOpacity
               style={[
-              styles.walletOptionButton,
-              {borderColor: id === selectedProvider ? '#23F600' : 'black'},
+                styles.walletOptionButton,
+                {borderColor: id === selectedProvider ? '#23F600' : 'black'},
               ]}
-            key={index}
-            onPress={onPress}>
-            <Text style={[styles.buttonText, {fontSize: 14}]}>
-              {textButton}
-            </Text>
-          </TouchableOpacity>
+              key={index}
+              onPress={onPress}>
+              <Text style={[styles.buttonText, {fontSize: 14}]}>
+                {textButton}
+              </Text>
+            </TouchableOpacity>
           ))}
         </View>
         <View style={styles.walletButtonOptionView}>
@@ -288,11 +311,13 @@ return (
                 <Text style={styles.labelText}>
                   Status: {formattedStatus()}
                 </Text>
-                <Text style={styles.labelText}>Carteira: {walletResponse}</Text>
+                <Text style={styles.labelText}>
+                  Carteira: {orderResponse.wallet}
+                </Text>
               </View>
             </>
           )}
-        </View>          
+        </View>
 
         <View style={styles.actionButtonsView}>
           {actionButton.map(({textButton, onPress}, index) => (
@@ -303,23 +328,30 @@ return (
               <Text style={styles.textButton}>{textButton}</Text>
             </TouchableOpacity>
           ))}
-        </View>
-        <View style={styles.sellButtonView}>
-            <TouchableOpacity style={styles.sellButtonStyle} onPress={() => sendStatusVenda()} >
-              <Text style={styles.textButton}>STATUS DA VENDA </Text>
+          {showBtnPixDeepLink && (
+            <TouchableOpacity
+              style={styles.actionButtonStyle}
+              onPress={onPressBtnPixDeepLink}>
+              <Text style={styles.textButton}>
+                {orderResponse.wallet == 'mercadopago'
+                  ? 'ABRIR MERCADO PAGO'
+                  : 'COPIAR PIX'}
+              </Text>
             </TouchableOpacity>
+          )}
         </View>
+      </View>
+      <Footer />
     </View>
-  </View>
   );
- };
- 
+};
+
 const styles = StyleSheet.create({
   mainView: {
-    flex:1,
-    backgroundColor:'white',
-    alignItems:'center',
-    padding:10,
+    flex: 1,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    padding: 10,
   },
   labelText: {
     fontWeight: 'bold',
@@ -336,7 +368,6 @@ const styles = StyleSheet.create({
     width: '90%',
     height: '85%',
     padding: 1,
-    
   },
   returnView: {
     width: '100%',
@@ -346,21 +377,21 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     borderColor: 'black',
     flexDirection: 'column',
-    marginBottom:20,
+    marginBottom: 10,
   },
   walletButtonOptionView: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 20,
+    marginBottom: 8,
   },
   walletOptionButton: {
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderRadius: 15,
-    minWidth: 100,
+    width: '30%',
     height: 35,
-    marginRight: 10,
+    marginRight: 5,
   },
   buttonText: {
     fontSize: 10,
@@ -382,11 +413,10 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   actionButtonsView: {
-    flexDirection:'row',
-    justifyContent:'space-between',
-    width:'100%',
-    marginBottom:5,
-
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    flexWrap: 'wrap',
   },
   actionButtonStyle: {
     width: '48%',
@@ -395,18 +425,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     justifyContent: 'center',
-  },
-  sellButtonView:{
-
-  },
-  sellButtonStyle:{
-    width: '100%',
-    height: 40,
-    backgroundColor: '#0069A5',
-    alignItems: 'center',
-    borderRadius: 10,
-    justifyContent: 'center',
-
+    marginTop: 3,
   },
   textButton: {
     color: 'white',
@@ -414,5 +433,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
- 
- export default CarteiraDigital;
+
+export default CarteiraDigital;
