@@ -9,6 +9,7 @@ public class MainActivity extends ReactActivity {
 
   Activity activity;
   public static Printer printer;
+  public static ElginPayService elginPayService;
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
@@ -26,6 +27,7 @@ public class MainActivity extends ReactActivity {
     activity = this;
 
     printer = new Printer(activity);
+    elginPayService = new ElginPayService(activity);
 
   }
 }

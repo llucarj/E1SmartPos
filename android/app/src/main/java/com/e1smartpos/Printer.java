@@ -2,6 +2,9 @@ package com.e1smartpos;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -174,9 +177,7 @@ public class Printer{
 
         int result;
 
-        File mSaveBit = new File(pathImage); // Your image file
-
-        Bitmap bitmap;
+        Bitmap bitmap = null;
 
         if(pathImage.equals("elgin")){
             int id = 0;
@@ -189,21 +190,22 @@ public class Printer{
             System.out.println("id: " + id);
 
             bitmap = BitmapFactory.decodeResource(mActivity.getApplicationContext().getResources(), id);
-        }else{
-            if(isBase64){
-                byte[] decodedString = Base64.decode(pathImage, Base64.DEFAULT);
-                bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-            }else{
-                String filePath = mSaveBit.getPath();
-                bitmap = BitmapFactory.decodeFile(filePath);
+        }
+        else{
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(mActivity.getContentResolver(), Uri.parse(pathImage));
+                if(isBase64){
+                    byte[] decodedString = Base64.decode(pathImage, Base64.DEFAULT);
+                    bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                }
+            } catch (Exception e) {
+                Log.e("Bitmap Error", e.toString());
             }
         }
 
         // result = Termica.ImprimeImagemMemoria(pathImage, 1);
         result = Termica.ImprimeBitmap(bitmap);
 
-        System.out.println("result IMAGEM: " + result);
         return result;
     }
 
