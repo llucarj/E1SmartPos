@@ -6,6 +6,7 @@ import {
     View,
     Image,
     TextInput,
+    DeviceEventEmitter,
     TouchableOpacity,
   } from 'react-native';
 

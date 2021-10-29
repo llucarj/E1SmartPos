@@ -64,9 +64,6 @@ const PrinterBarCode = ({route}) =>{
             case "UPC-A":
                 setCodigo("123601057072");
                 break;
-            case "UPC-E":
-                setCodigo("1234567"); 
-                break;
             case "CODE 39":
                 setCodigo("*ABC123*");
                 break;
@@ -144,7 +141,6 @@ const PrinterBarCode = ({route}) =>{
                         <Picker.Item label="EAN 13" value="EAN 13"/>
                         <Picker.Item label="QR Code" value="QR CODE" />
                         <Picker.Item label="UPC-A" value="UPC-A" />
-                        <Picker.Item label="UPC-E" value="UPC-E" />
                         <Picker.Item label="CODE 39" value="CODE 39" />
                         <Picker.Item label="ITF" value="ITF" />
                         <Picker.Item label="CODE BAR" value="CODE BAR" />
