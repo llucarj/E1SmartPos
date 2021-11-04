@@ -236,7 +236,7 @@ const Printer = ({navigation}) => {
         <View>
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => statusGaveta()}>
+            onPress={() => sendAbrirGaveta()}>
             <Text style={styles.actionButtonTXT}>ABRIR GAVETA</Text>
           </TouchableOpacity>
         </View>

@@ -93,6 +93,7 @@ const PrinterImage = ({route}) => {
         </View>
       </View>
       <View style={styles.submitButtonsView}>
+        <Text style={styles.subTitleText}>Para melhor experiência de impessão, selecione imagens com até 400 pixels de larguar</Text>
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => chooseImage('photo')}>
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 180,
     justifyContent: 'center',
-    marginVertical: 15,
+    marginVertical: 5,
   },
   imageZone: {
     width: 300,
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0069A5',
     height: 50,
     width: '100%',
-    marginVertical: 5,
+    marginVertical: 2,
   },
   imageStyleSettingsView: {
     flexDirection: 'column',

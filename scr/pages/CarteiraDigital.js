@@ -274,7 +274,7 @@ const CarteiraDigital = () => {
               ]}
               key={index}
               onPress={onPress}>
-              <Text style={[styles.buttonText, {fontSize: 14}]}>
+              <Text style={[styles.buttonText, {fontSize: 14,marginStart:textButton=="shipay-pagador"?10:0}]}>
                 {textButton}
               </Text>
             </TouchableOpacity>
@@ -391,13 +391,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderRadius: 15,
-    width: '30%',
-    height: 35,
-    marginRight: 5,
+    width: '33%',
+    height: 40,
+    marginRight:1, 
   },
   buttonText: {
     fontSize: 10,
     fontWeight: 'bold',
+    
   },
   inputValueView: {
     flexDirection: 'row',

@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         width:'90%',
        justifyContent:'space-between',
-       marginBottom:40,
+       marginBottom:18
 
     },
     fontPicker:{

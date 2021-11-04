@@ -163,30 +163,33 @@ const PrinterBarCode = ({route}) =>{
                     </View>
                 </View>
                 <View style={styles.barCodeStyleView}>
-                    <Text style={styles.labelText}>
-                        ESTILIZAÇÃO:
-                    </Text>
-                    <View style={styles.barCodeStyleSettingView} >
-
-                        <View style={styles.barCodeStylePicker}>
-                            <Text style={styles.optionText}>
-                                WIDTH:
-                            </Text>
-                            <Picker
-                                style={styles.codeTypePicker}
-                                selectedValue={selectedCodeWidth}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    setSelectedCodeWidth(itemValue)
-                                }>
-                                <Picker.Item label="1" value="1" />
-                                <Picker.Item label="2" value="2" />
-                                <Picker.Item label="3" value="3" />
-                                <Picker.Item label="4" value="4" />
-                                <Picker.Item label="5" value="5" />
-                                <Picker.Item label="6" value="6" />
-                            </Picker>
-                        </View>
-                         {selectedCodeType != "QR CODE" ? (
+                    {selectedCodeType=="CODE 128"||selectedCodeType=="QR CODE"?(
+                        <>
+                        <Text style={styles.labelText}>
+                            ESTILIZAÇÃO:
+                        </Text>
+                        <View style={styles.barCodeStyleSettingView}>
+                            <View style={styles.barCodeStylePicker}>
+                                <Text style={styles.optionText}>
+                                {selectedCodeType == 'QR CODE'
+                                    ? 'SQUARE'
+                                    : 'WIDTH'}:
+                                </Text>
+                                <Picker
+                                    style={styles.codeTypePicker}
+                                    selectedValue={selectedCodeWidth}
+                                    onValueChange={(itemValue, itemIndex) =>
+                                        setSelectedCodeWidth(itemValue)
+                                    }>
+                                    <Picker.Item label="1" value="1" />
+                                    <Picker.Item label="2" value="2" />
+                                    <Picker.Item label="3" value="3" />
+                                    <Picker.Item label="4" value="4" />
+                                    <Picker.Item label="5" value="5" />
+                                    <Picker.Item label="6" value="6" />
+                                </Picker>
+                            </View>
+                            {selectedCodeType != "QR CODE" ? (
                             <View style={[styles.barCodeStylePickerHeigth]}>
                                 <Text style={styles.optionText}>
                                     HEIGTH:
@@ -207,15 +210,19 @@ const PrinterBarCode = ({route}) =>{
                             <>
                             </>
                         )}
-                        <View style={styles.checkBoxStyleView}>
-                            <CheckBox
-                                disabled={route.params.conectionType==="intern"? true:false}
-                                value={isCutPaperActive}
-                                onValueChange={(newValue) => setIsCutPaperActive(newValue)}
-                            />
-                            <Text style={styles.optionText}>CUT PAPER</Text>
                         </View>
-                        
+                        </>
+                    ):(
+                        <>
+                        </>
+                    )}                    
+                    <View style={styles.checkBoxStyleView}>
+                        <CheckBox
+                            disabled={route.params.conectionType==="intern"? true:false}
+                            value={isCutPaperActive}
+                            onValueChange={(newValue) => setIsCutPaperActive(newValue)}
+                        />
+                        <Text style={styles.optionText}>CUT PAPER</Text>
                     </View>
                 </View>
                 <View style={styles.printterButtonView}>
