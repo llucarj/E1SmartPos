@@ -379,12 +379,12 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     borderColor: 'black',
     flexDirection: 'column',
-    marginBottom: 10,
+    marginBottom: 1,
   },
   walletButtonOptionView: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 8,
+    marginBottom: 5,
   },
   walletOptionButton: {
     justifyContent: 'center',
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   },
   actionButtonStyle: {
     width: '48%',
-    height: 40,
+    height: 35,
     backgroundColor: '#0069A5',
     alignItems: 'center',
     borderRadius: 10,
