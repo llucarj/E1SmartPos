@@ -44,10 +44,6 @@ const CarteiraDigital = () => {
     authenticate();
   }, []);
 
-  useEffect(() => {
-    authenticate();
-  }, []);
-
   const walletProviders = [
     {
       id: 'shipay',

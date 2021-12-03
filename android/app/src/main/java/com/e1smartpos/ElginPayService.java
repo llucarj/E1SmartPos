@@ -15,6 +15,7 @@ import android.os.Message;
 
 import com.elgin.e1.Pagamento.ElginPay;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -27,9 +28,32 @@ import br.com.setis.interfaceautomacao.SaidaTransacao;
 import br.com.setis.interfaceautomacao.Transacoes;
 
 public class ElginPayService {
+    public static ReactApplicationContext reactContext;
+
     private Context context;
     private static Activity mActivity;
     static ElginPay pagamento = new ElginPay();
+
+    /*private class CustomHandler extends Handler{
+        ElginPayService ctx;
+
+
+        public CustomHandler(Looper l, ElginPayService ctx){
+            super(l);
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            String saida = (String) msg.obj;
+
+            reactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit("lastTransitionOut", saida);
+            Toast.makeText(ctx.context, saida, Toast.LENGTH_LONG).show();
+        }
+    }*/
 
     public ElginPayService(Context c){
         context = c;
@@ -62,22 +86,6 @@ public class ElginPayService {
         pagamento.iniciarOperacaoAdministrativa(context, handler);
     }
 
-    /*private class CustomHandler extends Handler{
-        ElginPayService ctx;
 
-
-        public CustomHandler(Looper l, ElginPayService ctx){
-            super(l);
-            this.ctx = ctx;
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            String saida = (String) msg.obj;
-            Toast.makeText(ctx.context, saida, Toast.LENGTH_LONG).show();
-            Log.d("Retorno", saida);
-        }
-    }*/
 
 }

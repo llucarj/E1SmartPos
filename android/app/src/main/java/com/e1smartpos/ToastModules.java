@@ -74,6 +74,10 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             String saida = (String) msg.obj;
+
+            reactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit("lastTransitionOut", saida);
         }
     };
 

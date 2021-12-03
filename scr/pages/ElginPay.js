@@ -53,6 +53,17 @@ const ElginPay =()=>{
       {id:'0', icon: require('../icons/card.png'), textButton: 'A VISTA', onPress: ()=> setInstallmentType('0')},
   ];
 
+  let actualEvent = DeviceEventEmitter.addListener('lastTransitionOut', saida => {
+    //Armazenando o valor de saída da String
+    var lastTransitionOut = saida;
+
+    
+    setTimeout(() => {
+      actualEvent.remove();
+  }, 2000)
+   
+})
+
   function isEntriesValid(){
       if((paymentMeth === "Crédito") && (parseInt(numParcelas)  > 0) && (valor!="" && parseInt(valor)>=1)){
           return(true);
