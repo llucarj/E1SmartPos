@@ -56,7 +56,8 @@ const ElginPay =()=>{
   let actualEvent = DeviceEventEmitter.addListener('lastTransitionOut', saida => {
     //Armazenando o valor de saída da String
     var lastTransitionOut = saida;
-
+    
+    Alert.alert("String de Retorno",lastTransitionOut)
     
     setTimeout(() => {
       actualEvent.remove();
