@@ -14,25 +14,28 @@ import {
 import { DeviceEventEmitter } from 'react-native';
 import ElginPayService from '../services/service_elginpay';
 
+import moment from 'moment';
+import Dialog from "react-native-dialog";
+import CheckBox from '@react-native-community/checkbox';
+
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import DialogButton from 'react-native-dialog/lib/Button';
 
 const ElginPay =()=>{
   var elginPay = new ElginPayService();
 
-  const [ selectedOptionTEF, setSelectedOptionTEF ] = useState("");
-
-  const [ listOfResults, setListOfResults ] = useState([]);
-
-  const [ typeTEF, setTypeTEF ] = useState("PayGo");
-
-  const [ image64, setImage64 ] = useState("");
-
-  const [ valor, setValor ]=useState("1000");
+  const [valor, setValor ]=useState("1000");
+  const [formatValue,setFormatValue]=useState(" ")
   const [ numParcelas, setnumParcelas ] = useState("1");
-  const [ numIP, setNumIP ] = useState("192.168.0.00");
   const [ paymentMeth,  setPaymentMeth ] = useState("Crédito");
-  const [ installmentType, setInstallmentType ] = useState("0");
+  const [ installmentType, setInstallmentType ] = useState("3");
+
+  const [customLayout,setCustomLayout]=useState(false);
+
+  const [todayDate,setTodayDate] =useState(moment().utcOffset('-04:00').format("DD/MM/YY"));
+  const [refCode,setRefCode] = useState("");
+  const [isDialogVisible,setIsDialogvisible] = useState(false);
 
   const numIPRef = useRef(null);
   var isFirstTime = true;
@@ -48,53 +51,86 @@ const ElginPay =()=>{
   ];
 
   const buttonsInstallment = [
-      {id:'2', icon: require('../icons/store.png'), textButton: 'LOJA', onPress: ()=> setInstallmentType('2')},
-      {id:'1', icon: require('../icons/adm.png'), textButton: 'ADM ', onPress: ()=>setInstallmentType('1')},
-      {id:'0', icon: require('../icons/card.png'), textButton: 'A VISTA', onPress: ()=> setInstallmentType('0')},
+      {id:'3', icon: require('../icons/store.png'), textButton: 'LOJA', onPress: ()=> setInstallmentType('3')},
+      {id:'2', icon: require('../icons/adm.png'), textButton: 'ADM ', onPress: ()=>setInstallmentType('2')},
+      {id:'1', icon: require('../icons/card.png'), textButton: 'A VISTA', onPress: ()=> setInstallmentType('1')},
   ];
 
-  let actualEvent = DeviceEventEmitter.addListener('lastTransitionOut', saida => {
-    //Armazenando o valor de saída da String
-    var lastTransitionOut = saida;
-    
-    Alert.alert("String de Retorno",lastTransitionOut)
-    
-    setTimeout(() => {
-      actualEvent.remove();
-  }, 2000)
-   
-})
+let actualEvent =DeviceEventEmitter.addListener(
+    'lastTransitionOut',
+    event=>{
+        console.log("Retorno Transação React",event);
+        Alert.alert("Retorno ElginPay",event);
 
-  function isEntriesValid(){
-      if((paymentMeth === "Crédito") && (parseInt(numParcelas)  > 0) && (valor!="" && parseInt(valor)>=1)){
-          return(true);
-      }
-      else if(paymentMeth==="Débito"&& parseInt(valor)>=1 ){
+        
+    },
+);
+
+
+function changeLayout(isLayoutOn){
+    if(isLayoutOn){
+        setCustomLayout(true);
+        
+    }else{
+        setCustomLayout(false);
+    }
+    elginPay.sendLayoutCustomization(isLayoutOn);
+}
+
+
+
+
+function formatEntries(){
+    setTodayDate(moment().utcOffset('-04:00').format("DD/MM/YY"))
+}
+
+function sendActionTef(action){
+    if(isEntriesValid(action)){
+        formatEntries()
+        sendElginPayParam(action);
+    }
+}
+
+function isEntriesValid(action){
+ 
+    if((paymentMeth === "Crédito") && (parseInt(numParcelas)  > 0) && (valor!="" && parseInt(valor)>=1)){
         return(true);
-      }else{
+    }
+    else if(paymentMeth==="Débito"&& (valor!="" && parseInt(valor)>=1) ){
+        return(true);
+    }else if((action==="CANCEL")&& (valor!="" && parseInt(valor)>=1)){
+        return(true);
+    }else{
         Alert.alert("Entradas inválidas","Por favor, insira valores de entrada válidos!")
-      }
-  }
+    }
+}
 
-  function sendActionTef(action){
-      if(isEntriesValid()){
-          sendElginPayParam(action);
-      }
-  }
 
-  function sendElginPayParam(action){
-      if(action ==="SALE"){
-          if(paymentMeth==="Crédito"){
-            elginPay.sendCreditPayment(valor,installmentType);
-          }else if (paymentMeth==="Débito"){
-            elginPay.sendDebitPayment(valor);
-          }
-      }
 
-      if(action ==="CANCEL"){
-          elginPay.sendCancelSell(valor);
-      }
+function sendElginPayParam(action){
+    if(action ==="SALE"){
+        if(paymentMeth==="Crédito"){
+            elginPay.sendCreditPayment(valor.replace(/[^\d]+/g,''),installmentType,numParcelas);
+            
+           
+        }else if (paymentMeth==="Débito"){
+            elginPay.sendDebitPayment(valor.replace(/[^\d]+/g,''));
+        }
+    }
+    if(action ==="CANCEL"){
+        if(refCode!=" "){
+            setIsDialogvisible(false)
+            
+            elginPay.sendCancelSell(valor.replace(/[^\d]+/g,''),refCode,todayDate);
+        } else {
+            Alert.alert("Código de Referência Vazio","Por favor, insira um código de referência válido")
+        }
+    }
 
+    
+
+    
+    
   }
 
   function configElginPay(){
@@ -103,7 +139,7 @@ const ElginPay =()=>{
 
 return(
     <View style={styles.mainView}>
-        <Header textTitle={'ELGIN PAY'}/>         
+        <Header textTitle="ELGIN PAY"/>         
           <View style={styles.configView}>
             <View style={styles.inputView}>
               <Text style={styles.labelText}>VALOR:</Text>
@@ -115,16 +151,21 @@ return(
                 value={valor}              
               />                        
             </View>
-            {/*< View style={styles.inputView}>
-                <Text style={styles.labelText}>Nº PARCELAS:</Text>
-                <TextInput
-                    placeholder={'00'}
-                    style={styles.inputMensage}
-                    keyboardType='numeric'
-                    onChangeText={setnumParcelas}
-                    value={numParcelas}              
-                />
-            </View>*/}
+            {paymentMeth !== "Débito" && (
+                <>
+                    < View style={styles.inputView}>
+                        <Text style={styles.labelText}>Nº PARCELAS:</Text>
+                        <TextInput
+                            placeholder={'00'}
+                            style={styles.inputMensage}
+                            keyboardType='numeric'
+                            onChangeText={setnumParcelas}
+                            value={numParcelas}              
+                        />
+                    </View>
+                </>
+            )}
+           
             <View marginBottom={15}>
               <View style={styles.paymentView}>
                   <Text style={styles.labelText}> FORMAS DE PAGAMENTO </Text>
@@ -161,8 +202,29 @@ return(
                         </View>
                     </>
                 )}
-                
             </View>
+
+            <View>
+                <Dialog.Container visible={isDialogVisible}>
+                    <Dialog.Title>Código de Referência</Dialog.Title>
+                    <Dialog.Input label="Insira o código de referência"
+                    onChangeText={setRefCode}
+                    value={refCode}  
+                    ></Dialog.Input>
+                    <Dialog.Button label="CANCELAR" onPress={()=>setIsDialogvisible(false)}/>
+                    <Dialog.Button label="OK" onPress={()=>sendActionTef('CANCEL')}/>
+                    
+                </Dialog.Container>
+            </View>
+
+            <View style={styles.checkBoxStyleView}>
+                <CheckBox
+                value={customLayout}
+                onValueChange={newValue => changeLayout(newValue)}
+                />
+                <Text style={styles.optionText}>LAYOUT CUSTOMIZADO</Text>
+            </View>
+         
             <View marginBottom={80}>
               <View style={styles.submitionButtonsView}>
                   <TouchableOpacity style={styles.submitionButton} onPress={() => sendActionTef('SALE')} >
@@ -170,7 +232,7 @@ return(
                           ENVIAR TRANSAÇÃO
                       </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.submitionButton} onPress={() => sendActionTef('CANCEL')} >
+                  <TouchableOpacity style={styles.submitionButton} onPress={()=> setIsDialogvisible(true)} >
                       <Text style={styles.textButton}>
                           CANCELAR TRANSAÇÃO
                       </Text>
@@ -208,6 +270,7 @@ const styles = StyleSheet.create({
   optionText:{
       fontSize:14,
       fontWeight:'bold',
+      color:'black',
   },
   titleText:{
       textAlign:'center',
@@ -265,6 +328,10 @@ const styles = StyleSheet.create({
       width:100,
       height:35,
       marginHorizontal: 5,
+  },
+  checkBoxStyleView: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   icon:{
       width:30,

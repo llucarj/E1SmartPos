@@ -198,7 +198,6 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
     }
 
     @ReactMethod
-
     public void sendOptionElginPay(ReadableMap configsReceived){
         WritableMap result = Arguments.createMap();
 
@@ -213,6 +212,8 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
 
         }else if(configsReceived.getString("typeTransition").equals("cancelTransaction")){
             ElginPayService.IniciarCancelamentoVenda(configsReceived,reactContext.getCurrentActivity(),handler);
+        }else if(configsReceived.getString("typeTransition").equals("customization")){
+            ElginPayService.IniciarCustomizacao(configsReceived);
         }
     }
 

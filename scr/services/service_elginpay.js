@@ -8,13 +8,15 @@ export default class ElginPayService{
         NativeModulesE1.sendOptionElginPay(mapParam);
     };
 
-    sendCreditPayment(valor,installmentType){
+    sendCreditPayment(valor,installmentType,numParcelas){
         const mapParam = {
             "typeTransition":"creditTransaction",
             "value": valor,
             "installment": installmentType,
+            "numInstallment": numParcelas,
         }
 
+        console.log(mapParam);
         this.sendFunctionToAndroid(mapParam);
 
     }
@@ -23,7 +25,7 @@ export default class ElginPayService{
             "typeTransition":"debitTransaction",
             "value": valor,
         }
-
+        console.log(mapParam);
         this.sendFunctionToAndroid(mapParam);
     }
 
@@ -36,14 +38,24 @@ export default class ElginPayService{
         
     }
 
-    sendCancelSell(valor){
+    sendCancelSell(valor,ref,data){
         const mapParam = {
             "typeTransition":"cancelTransaction",
             "value": valor,
+            "ref":ref,
+            "data":data,
         }
-
         this.sendFunctionToAndroid(mapParam);
 
     }
+    
+    sendLayoutCustomization(isCustominzationOn){
+        const mapParam={
+            "typeTransition":"customization",
+            "customizationStatus":isCustominzationOn,
+        }
+        this.sendFunctionToAndroid(mapParam);
+    }
+
 
 }
