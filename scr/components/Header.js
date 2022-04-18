@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet,Image} from 'react-native';
 
-import Logo from '../icons/ElginDeveloperCommunity.png'
+import Logo from '../icons/elgin_logo.png'
 
 const Header = ({textTitle}) =>{
     return(

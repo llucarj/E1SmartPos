@@ -69,18 +69,6 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
 
     public void onNewIntent(Intent intent){}
 
-    private Handler handler = new Handler(Looper.getMainLooper()){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            String saida = (String) msg.obj;
-
-            reactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit("lastTransitionOut", saida);
-        }
-    };
-
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data){
         //IntentResult resultIntent = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
@@ -202,16 +190,16 @@ public class ToastModules extends ReactContextBaseJavaModule implements Activity
         WritableMap result = Arguments.createMap();
 
         if(configsReceived.getString("typeTransition").equals("creditTransaction")){
-            ElginPayService.IniciarPagamentoCredito(configsReceived,reactContext.getCurrentActivity(),handler);
+            ElginPayService.IniciarPagamentoCredito(configsReceived);
 
         }else if(configsReceived.getString("typeTransition").equals("debitTransaction")){
-            ElginPayService.IniciarPagamentoDebito(configsReceived,reactContext.getCurrentActivity(),handler);
+            ElginPayService.IniciarPagamentoDebito(configsReceived);
 
         }else if(configsReceived.getString("typeTransition").equals("admTransaction")){
-            ElginPayService.IniciarOperacaoAdministrativa(reactContext.getCurrentActivity(),handler);
+            ElginPayService.IniciarOperacaoAdministrativa();
 
         }else if(configsReceived.getString("typeTransition").equals("cancelTransaction")){
-            ElginPayService.IniciarCancelamentoVenda(configsReceived,reactContext.getCurrentActivity(),handler);
+            ElginPayService.IniciarCancelamentoVenda(configsReceived);
         }else if(configsReceived.getString("typeTransition").equals("customization")){
             ElginPayService.IniciarCustomizacao(configsReceived);
         }

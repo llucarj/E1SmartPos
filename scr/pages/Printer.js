@@ -10,9 +10,7 @@ import {
   Alert,
 } from 'react-native';
 
-import {useNavigation} from '@react-navigation/native';
 import {RadioButton} from 'react-native-paper';
-import Logo from '../icons/ElginDeveloperCommunity.png';
 import Header from '../components/Header';
 
 import PrinterService from '../services/service_printer';

@@ -1,6 +1,4 @@
-
  import React from 'react';
- import {useNavigation} from '@react-navigation/native';
  import {
    StyleSheet,
    Text,
@@ -9,20 +7,16 @@
    TouchableOpacity,
  } from 'react-native';
 
- import Logo from '../icons/ElginDeveloperCommunity.png'
-import Footer from '../components/Footer';
- 
-
-
+ import Logo from '../icons/elgin_logo.png'
+ import Footer from '../components/Footer';
  
  const Menu =({navigation})=> {
    
-
    const buttonsMenuData = [
-    {icon: require('../icons/printer.png'), textButton: 'IMPRESSORA',onPress: () => navigation.navigate('Printer')},
-    {icon: require('../icons/msitef.png'), textButton: 'ELGIN PAY',onPress: () => navigation.navigate('ElginPay')},
-    {icon: require('../icons/msitef.png'), textButton: 'CARTEIRA DIGITAL',onPress: () => navigation.navigate('CarteiraDigital')},
-    {icon: require('../icons/barCode.png'), textButton: 'LEITOR DE CÓDIGO',onPress: () => navigation.navigate('BarCodes')},
+    {icon: require('../icons/printer.png'), textButton: 'IMPRESSORA', onPress: () => navigation.navigate('Printer')},
+    {icon: require('../icons/elginpay_logo.png'), textButton: 'ELGIN PAY', onPress: () => navigation.navigate('ElginPay')},
+    {icon: require('../icons/msitef.png'), textButton: 'CARTEIRA DIGITAL', onPress: () => navigation.navigate('CarteiraDigital')},
+    {icon: require('../icons/barCode.png'), textButton: 'LEITOR DE CÓDIGO', onPress: () => navigation.navigate('BarCodes')},
 ];
  
    return (
@@ -51,26 +45,32 @@ import Footer from '../components/Footer';
    );
  };
  
- const styles = StyleSheet.create({
+ const styles = StyleSheet.create(
+  {
+
   mainView:{
     flex:1,
     backgroundColor:'white',
   },
+
   contentView:{
     height:'100%',
     width:'80%',
     alignSelf:'center',
 
   },
+
   bannerView:{
     alignItems: 'center',
     justifyContent:'center',
   },
+
   banner:{
-    resizeMode:'contain',
-    width: '100%',
-    height: 139,
+    resizeMode: 'contain',
+    height: 140,
+    width: 350
   },
+  
   menuView:{
     flexDirection:'row',
     flexDirection:'column',
@@ -80,9 +80,11 @@ import Footer from '../components/Footer';
     width:'100%',
    
   },
+
   footerView:{
     position:'relative',
   },
+
   buttonMenu:{
     flexDirection:'column',
     justifyContent:'center',
@@ -93,11 +95,12 @@ import Footer from '../components/Footer';
     height:100,
     
   },
-  icon:{
-    width:50,
-    height:50,
-  },
 
+  icon:{
+    resizeMode: 'contain',
+    width: 150,
+    height: 60,
+  },
 
   textButton: {
     fontWeight: 'bold',

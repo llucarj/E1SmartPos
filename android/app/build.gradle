@@ -197,9 +197,8 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     //LIBS ADDED TO PROJECT E1 EXPERIENCE
-    implementation(name: 'e1-v1.0.16-release', ext: 'aar')
+    implementation(name: 'e1-v2.0.4-release', ext: 'aar')
 
-    implementation(name: 'minipdvm8', ext: 'aar')
     implementation(name: 'cloudpossdk-s-1.0.2', ext: 'aar')
     implementation(name: 'InterfaceAutomacao-v2.0.0.9', ext: 'aar')
     implementation group: 'org.apache.commons', name: 'commons-lang3', version:'3.4'

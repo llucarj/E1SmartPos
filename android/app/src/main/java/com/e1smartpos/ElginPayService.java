@@ -36,89 +36,73 @@ import br.com.setis.interfaceautomacao.SaidaTransacao;
 import br.com.setis.interfaceautomacao.Transacoes;
 
 public class ElginPayService {
-    public static ReactApplicationContext reactContext;
 
-    private static Context context;
-    private static Activity mActivity;
-    private static Personalizacao personalizacao;
-    static ElginPay pagamento = new ElginPay();
+    final private static ElginPay pagamento = new ElginPay();
 
-    /*private class CustomHandler extends Handler{
-        ElginPayService ctx;
+    private static Context elginpayContext;
 
-
-        public CustomHandler(Looper l, ElginPayService ctx){
-            super(l);
-            this.ctx = ctx;
-        }
-
+    private final static Handler elginpayHandler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             String saida = (String) msg.obj;
 
-            reactContext
+            ToastModules.reactContext
                     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                     .emit("lastTransitionOut", saida);
-            Toast.makeText(ctx.context, saida, Toast.LENGTH_LONG).show();
         }
-    }*/
+    };
 
-    public ElginPayService(Context c){
-        context = c;
+    public ElginPayService(Context elginpayContext){
+        this.elginpayContext = elginpayContext;
     }
 
-    public static void setPersonalizacao(Personalizacao mPersonalizacao) {
-        personalizacao = mPersonalizacao;
-    }
 
-    public static void IniciarPagamentoDebito(ReadableMap map,Context context,Handler handler){
-
+    public static void IniciarPagamentoDebito(ReadableMap map){
         String value = (String) map.getString("value");
 
-        pagamento.iniciaVendaDebito(value, context, handler);
+        pagamento.iniciaVendaDebito(value, elginpayContext, elginpayHandler);
     }
 
-    public static void IniciarPagamentoCredito(ReadableMap map,Context context,Handler handler)
+    public static void IniciarPagamentoCredito(ReadableMap map)
     {
         String value = (String) map.getString("value");
         int installment = Integer.parseInt(map.getString("installment"));
-        int numInstallment= Integer.parseInt(map.getString("numInstallment"));
+        int numInstallment = Integer.parseInt(map.getString("numInstallment"));
 
-        pagamento.iniciaVendaCredito(value, installment,numInstallment, context, handler);
+        pagamento.iniciaVendaCredito(value, installment, numInstallment, elginpayContext, elginpayHandler);
     }
 
-    public static void IniciarCancelamentoVenda(ReadableMap map, Context context, Handler handler)
+    public static void IniciarCancelamentoVenda(ReadableMap map)
     {
-        String value= (String) map.getString("value");
+        String value = (String) map.getString("value");
         String saleRef = (String) map.getString("ref");
         String todayDate = (String) map.getString("data");
 
-
-        pagamento.iniciaCancelamentoVenda(value, saleRef, todayDate, context, handler);
+        pagamento.iniciaCancelamentoVenda(value, saleRef, todayDate, elginpayContext, elginpayHandler);
     }
 
-    public static void IniciarOperacaoAdministrativa(Context context,Handler handler)
+    public static void IniciarOperacaoAdministrativa()
     {
-        pagamento.iniciaOperacaoAdministrativa(context, handler);
+        pagamento.iniciaOperacaoAdministrativa(elginpayContext, elginpayHandler);
     }
 
     public static void IniciarCustomizacao(ReadableMap map){
         Boolean isCustomizationOn = (Boolean) map.getBoolean("customizationStatus");
-        if(isCustomizationOn){
+
+        if(isCustomizationOn)
             setCustomLayoutOn();
-        }else{
+        else
             setCustomLayoutOff();
-        }
     }
 
     public static void setCustomLayoutOn(){
         System.out.println("Customização BatPay On");
-        setPersonalizacao(obterPersonalizacao());
+        pagamento.setPersonalizacao(obterPersonalizacao());
     }
 
     public static void setCustomLayoutOff(){
-        setPersonalizacao(new Personalizacao.Builder().build());
+        pagamento.setPersonalizacao(new Personalizacao.Builder().build());
         System.out.println("Customização BatPay Off");
     }
 
@@ -127,10 +111,10 @@ public class ElginPayService {
         try{
             File f = new File("sdcard/logo2.png");
             OutputStream outputStream = new FileOutputStream(f);
-            byte buffer[] = new byte[1024];
+            byte[] buffer = new byte[1024];
             int length = 0;
 
-            while((length=inputStream.read(buffer)) > 0) {
+            while((length = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer,0,length);
             }
 
@@ -163,7 +147,7 @@ public class ElginPayService {
         pb.informaCorSeparadorMenu(corDestaque);
 
         try {
-            AssetManager am = context.getAssets();
+            AssetManager am = elginpayContext.getAssets();
             InputStream inputStream = am.open("logo.png");
             File file = createFileFromInputStream(inputStream);
             pb.informaIconeToolbar(file);

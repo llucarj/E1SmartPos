@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import CheckBox from '@react-native-community/checkbox';
-import Logo from '../../icons/ElginDeveloperCommunity.png';
+import Logo from '../../icons/elgin_logo.png';
 
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
@@ -45,7 +45,7 @@ const PrinterImage = ({route}) => {
 
   function doPrinterImage() {
     //SE NENHUMA IMAGEM FOI SELECIONADA NO DISPOSITIVO
-    //ENVIA INFORMAÇÃO PARA IMPRIMIR IMAGEM PADRÃO DO APP - elgin.jpg
+    //ENVIA INFORMAÇÃO PARA IMPRIMIR IMAGEM PADRÃO DO APP - elgin_logo_defautl_print_image
     if (pathImage === '') {
       printerService.sendPrinterImage('elgin', false);
     } else {
@@ -93,7 +93,7 @@ const PrinterImage = ({route}) => {
         </View>
       </View>
       <View style={styles.submitButtonsView}>
-        <Text style={styles.subTitleText}>Para melhor experiência de impessão, selecione imagens com até 400 pixels de larguar</Text>
+        <Text style={styles.subTitleText}>Para melhor experiência de impressão, selecione imagens com até 400 pixels de largura</Text>
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => chooseImage('photo')}>

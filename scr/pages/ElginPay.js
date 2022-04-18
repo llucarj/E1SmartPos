@@ -25,15 +25,15 @@ import DialogButton from 'react-native-dialog/lib/Button';
 const ElginPay =()=>{
   var elginPay = new ElginPayService();
 
-  const [valor, setValor ]=useState("1000");
-  const [formatValue,setFormatValue]=useState(" ")
+  const [valor, setValor ] = useState("2000");
+  const [formatValue,setFormatValue] = useState(" ")
   const [ numParcelas, setnumParcelas ] = useState("1");
   const [ paymentMeth,  setPaymentMeth ] = useState("Crédito");
   const [ installmentType, setInstallmentType ] = useState("3");
 
-  const [customLayout,setCustomLayout]=useState(false);
+  const [customLayout,setCustomLayout] = useState(false);
 
-  const [todayDate,setTodayDate] =useState(moment().utcOffset('-04:00').format("DD/MM/YY"));
+  const [todayDate,setTodayDate] = useState(moment().utcOffset('-04:00').format("DD/MM/YY"));
   const [refCode,setRefCode] = useState("");
   const [isDialogVisible,setIsDialogvisible] = useState(false);
 
@@ -56,16 +56,16 @@ const ElginPay =()=>{
       {id:'1', icon: require('../icons/card.png'), textButton: 'A VISTA', onPress: ()=> setInstallmentType('1')},
   ];
 
-let actualEvent =DeviceEventEmitter.addListener(
-    'lastTransitionOut',
-    event=>{
-        console.log("Retorno Transação React",event);
-        Alert.alert("Retorno ElginPay",event);
+  //Registra o evento de saída do elginpay ao criar a página e remove o listener ao sair da página
+  useEffect(() => {
+    let event = DeviceEventEmitter.addListener('lastTransitionOut', lastTransitionOut => { Alert.alert("String de Retorno", lastTransitionOut) });
 
-        
-    },
-);
-
+    return () => {
+        event.remove();
+        //Desabilita o layout customizado ao sair da página
+        elginPay.sendLayoutCustomization(false);
+    }
+  }, []);
 
 function changeLayout(isLayoutOn){
     if(isLayoutOn){
@@ -76,9 +76,6 @@ function changeLayout(isLayoutOn){
     }
     elginPay.sendLayoutCustomization(isLayoutOn);
 }
-
-
-
 
 function formatEntries(){
     setTodayDate(moment().utcOffset('-04:00').format("DD/MM/YY"))
@@ -91,8 +88,7 @@ function sendActionTef(action){
     }
 }
 
-function isEntriesValid(action){
- 
+function isEntriesValid(action){ 
     if((paymentMeth === "Crédito") && (parseInt(numParcelas)  > 0) && (valor!="" && parseInt(valor)>=1)){
         return(true);
     }
@@ -104,8 +100,6 @@ function isEntriesValid(action){
         Alert.alert("Entradas inválidas","Por favor, insira valores de entrada válidos!")
     }
 }
-
-
 
 function sendElginPayParam(action){
     if(action ==="SALE"){
@@ -126,11 +120,6 @@ function sendElginPayParam(action){
             Alert.alert("Código de Referência Vazio","Por favor, insira um código de referência válido")
         }
     }
-
-    
-
-    
-    
   }
 
   function configElginPay(){
@@ -166,7 +155,7 @@ return(
                 </>
             )}
            
-            <View marginBottom={15}>
+            <View >
               <View style={styles.paymentView}>
                   <Text style={styles.labelText}> FORMAS DE PAGAMENTO </Text>
                   <View style={styles.paymentsButtonView}>
@@ -268,7 +257,7 @@ const styles = StyleSheet.create({
     alignItems:'center',
   },
   optionText:{
-      fontSize:14,
+      fontSize: 14,
       fontWeight:'bold',
       color:'black',
   },
@@ -289,6 +278,7 @@ const styles = StyleSheet.create({
       width:'100%',
   },
   inputMensage:{
+      textAlign: 'center',
       flexDirection:'row',
       width:'70%',
       borderBottomWidth:0.5,
@@ -301,9 +291,7 @@ const styles = StyleSheet.create({
       flexDirection:'column',
       width:'90%',
       height:'80%',
-      marginTop:50,
-      
-
+      marginTop:30,
   },
   paymentView:{
       marginVertical:20,
@@ -332,6 +320,7 @@ const styles = StyleSheet.create({
   checkBoxStyleView: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10
   },
   icon:{
       width:30,
