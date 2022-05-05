@@ -18,6 +18,8 @@
     {icon: require('../icons/msitef.png'), textButton: 'CARTEIRA DIGITAL', onPress: () => navigation.navigate('CarteiraDigital')},
     {icon: require('../icons/barCode.png'), textButton: 'LEITOR DE CÓDIGO', onPress: () => navigation.navigate('BarCodes')},
 ];
+
+             
  
    return (
      <View style={styles.mainView}>
@@ -26,21 +28,52 @@
            <Image style={styles.banner} source={Logo}/>
           </View>
           <View style={styles.menuView}>
-            {buttonsMenuData.map(({icon,textButton,onPress},index)=>(
+            <View style={styles.largeButtonView}>
               <TouchableOpacity 
-                style={[styles.buttonMenu]} 
-                key={index}
-                onPress={onPress}
+                style={styles.buttonMenu} 
+                onPress={()=>navigation.navigate('ElginPay')}
               >
-                <Image style={styles.icon} source={icon}/>
-                <Text style={styles.textButton}>{textButton}</Text>
+                <Image style={styles.icon} source={require('../icons/elginpay_logo.png')}/>
+                <Text style={styles.textButton}>ELGIN PAY</Text>
               </TouchableOpacity>
-              ))}
+            </View>
+            <View style={styles.doubleButtonView}>
+              <TouchableOpacity 
+                style={styles.doubleButton} 
+                onPress={()=>navigation.navigate('Printer')}
+              >
+                <Image style={styles.icon} source={require('../icons/printer.png')}/>
+                <Text style={styles.textButton}>IMPRESSORA</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.doubleButton} 
+                onPress={()=>navigation.navigate('CarteiraDigital')}
+              >
+                <Image style={styles.icon} source={require('../icons/msitef.png')}/>
+                <Text style={styles.textButton}>CARTEIRA DIGITAL</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.doubleButtonView}>
+              <TouchableOpacity 
+                style={styles.doubleButton} 
+                onPress={()=>navigation.navigate('Nfce')}
+              >
+                <Image style={styles.icon} source={require('../icons/nfce.png')}/>
+                <Text style={styles.textButton}>NFC-e</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.doubleButton} 
+                onPress={()=>navigation.navigate('BarCodes')}
+              >
+                <Image style={styles.icon} source={require('../icons/barCode.png')}/>
+                <Text style={styles.textButton}>LEITOR DE CÓDIGO</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+          
           <Footer/>
-        
         </View>
-        
+          
        </View>
    );
  };
@@ -51,12 +84,14 @@
   mainView:{
     flex:1,
     backgroundColor:'white',
+
   },
 
   contentView:{
     height:'100%',
     width:'80%',
     alignSelf:'center',
+    
 
   },
 
@@ -72,10 +107,10 @@
   },
   
   menuView:{
-    flexDirection:'row',
+
     flexDirection:'column',
-    justifyContent:'space-around',
-    alignItems:'center',
+    justifyContent:'center',
+    alignContent:'space-around',
     height:420,
     width:'100%',
    
@@ -95,7 +130,26 @@
     height:100,
     
   },
-
+  doubleButton:{
+    flexDirection:'column',
+    justifyContent:'center',
+    alignItems:'center',
+    borderWidth:2,
+    borderRadius:25,
+    width:'49%',
+    height:100,
+  },
+  largeButtonView:{
+    width:'100%',
+    marginBottom:10,
+  },
+  doubleButtonView:{
+    flexDirection:'row',
+    justifyContent:'space-around',
+    alignItems:'center',
+    width:'100%',
+    marginBottom:10,
+  },
   icon:{
     resizeMode: 'contain',
     width: 150,

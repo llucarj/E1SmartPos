@@ -39,13 +39,13 @@ const PrinterText = ({route}) =>{
 
     const [isBold,setIsBold]=useState(false);
     const [isUnderline,setIsUnderline]=useState(false);
-    const [isCutPaperActive,setIsCutPaperActive]=useState(false);
+    //const [isCutPaperActive,setIsCutPaperActive]=useState(false);
     
     
     const checkBoxType = [
         {id:'NEGRITO', textButton: 'NEGRITO', value:isBold ,setValue: (value) => setIsBold(value)},
         {id:'SUBLINHADO', textButton: 'SUBLINHADO', value: isUnderline ,setValue: (value) =>setIsUnderline(value)},
-        {id:'CUT-PAPER', textButton: 'CUTPAPER', value:isCutPaperActive ,setValue: (value) =>setIsCutPaperActive(value)},
+        /*{id:'CUT-PAPER', textButton: 'CUTPAPER', value:isCutPaperActive ,setValue: (value) =>setIsCutPaperActive(value)},*/
     ]
 
     const buttonOptionRender=[
@@ -66,10 +66,10 @@ const PrinterText = ({route}) =>{
                 parseInt(selectedFontSize),
             );
             printerService.jumpLine(10);
-
+            /*
             if(route.params.conectionType==="extern"){
                 if(isCutPaperActive) printerService.cutPaper(10);
-            }
+            }*/
         }
 
     
@@ -83,9 +83,10 @@ const PrinterText = ({route}) =>{
         printerService.sendPrinterNFCe(xmlNFCE, 1, "CODIGO-CSC-CONTRIBUINTE-36-CARACTERES", 0);
 
         printerService.jumpLine(10);
+        /*
         if(route.params.conectionType==="extern"){
             if(isCutPaperActive) printerService.cutPaper(10);
-        }
+        }*/
     }
 
     function doPrinterXmlSAT(){
@@ -96,9 +97,9 @@ const PrinterText = ({route}) =>{
             0,
         );
         
-        if(route.params.conectionType==="extern"){
+        /*if(route.params.conectionType==="extern"){
             if(isCutPaperActive) printerService.cutPaper(10);
-        }
+        }*/
     }
 
     return(
