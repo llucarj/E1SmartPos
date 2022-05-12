@@ -1,4 +1,6 @@
-import React,{useState,useEffect, useRef} from 'react';
+import React,{useState, useEffect} from 'react';
+import { formatNumber } from 'react-native-currency-input';
+import { FakeCurrencyInput } from 'react-native-currency-input';
 
 import {
     StyleSheet,
@@ -7,32 +9,102 @@ import {
     Image,
     TouchableOpacity,
     Alert,
-    FlatList,
+    ToastAndroid,
+    DeviceEventEmitter,
     TextInput
 } from 'react-native';
 
 import Logo from '../icons/elgin_logo.png'
-
-import Header from '../components/Header'
 import Footer from '../components/Footer'
+import { backgroundColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
+import PrinterService from '../services/service_printer';
+import NfceService from '../services/service_nfce';
+import { TOUCHABLE_STATE } from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchable';
+
+const Nfce = () => {
+
+    useEffect(() => {
+        startConnectPrinterIntern();
+
+        return () => {
+            stopPrinterIntern();
+        }
+      }, []);
+
+    function startConnectPrinterIntern() {
+        printerService.sendStartConnectionPrinterIntern();
+    }
+    
+    function stopPrinterIntern() {
+        printerService.printerStop();
+    }
+
+    var printerService = new PrinterService();
+    var nfceService = new NfceService();
+
+    const [isSendSaleNfceEnabled, setIsSendSaleNfceEnabled] = useState(false)
+    const [productName, setProductName] = useState('CAFE');
+    const [productPrice, setProductPrice] = useState('8.00');
+    const [emitionTime, setEmitionTime] = useState('');
+    const [noteNumber, setNoteNumber] = useState('');
+    const [serieNumber, setSerieNumber] = useState('');
 
 
-
-
-
-const Nfce =()=> {
-    const [productName,setProductName]=useState('');
-    const [productPrice,setProductPrice]=useState('');
-    const [emitionTime,setEmitionTime]=useState('');
-    const [noteNumber,setNoteNumber]=useState('');
-    const [serieNumber,setSerieNumber]= useState('');
-
-
-    const configButtons =[
-        {id:'configNfce',textButton:'CONFIGURAR NFCE'},
-        {id:'sendSellNfce',textButton:'ENVIAR VENDA NFCE'}
-
+    const configButtons = [
+        {id:'configNfce', textButton:'CONFIGURAR NFCE', onPress: () => sendConfigurateXmlNfce()},
+        {id:'sendSaleNfce', textButton:'ENVIAR VENDA NFCE', onPress: () => sendSaleNfce()}
     ]
+
+    function sendConfigurateXmlNfce(){
+        let actualEvent = DeviceEventEmitter.addListener("eventConfigurateXmlNfce",
+            eventReturn => {
+                
+                ToastAndroid.show(eventReturn, ToastAndroid.LONG);
+                if(eventReturn === "NFC-e configurada com sucesso!");
+                    setIsSendSaleNfceEnabled(true)
+
+                actualEvent.remove();
+            }
+        );
+
+        nfceService.sendConfigurateXmlNfce();
+    }
+
+    function sendSaleNfce(){
+       console.log(productName, getProductPriceFormatted());
+       let actualEvent = DeviceEventEmitter.addListener("eventSendSaleNfce",
+            eventReturn => {
+                
+                const resultSplitted = eventReturn.split("|");
+
+                if(resultSplitted[0] === "NFC-e emitida com sucesso!"){
+                    setEmitionTime(resultSplitted[1] + " SEGUNDOS");
+                    setNoteNumber(resultSplitted[2]);
+                    setSerieNumber(resultSplitted[3]);
+                } else if (resultSplitted[0] === "Erro ao emitir NFC-e online, a impressão será da nota em contingência!"){
+                    setEmitionTime("");
+                    setNoteNumber(resultSplitted[1]);
+                    setSerieNumber(resultSplitted[2]);
+                } 
+                Alert.alert("NFC-e", resultSplitted[0]);
+                
+
+                actualEvent.remove();
+            }
+       );
+    
+       nfceService.sendSaleNfce(productName, getProductPriceFormatted());
+    }
+
+    function getProductPriceFormatted(){
+        return formatNumber(productPrice, {
+            separator: '.',
+            prefix: '',
+            precision: 2,
+            delimiter: '',
+            signPosition: 'beforePrefix',
+          });
+    }
 
     return(
         <View style={styles.mainView}>
@@ -45,7 +117,6 @@ const Nfce =()=> {
                         <View style={styles.dataInputView}>
                             <Text style={styles.labelText}>NOME DO PRODUTO:</Text>
                             <TextInput
-                                placeholder={'CAFE'}
                                 style={styles.inputMensage}
                                 keyboardType='default'
                                 onChangeText={setProductName}
@@ -54,20 +125,28 @@ const Nfce =()=> {
                         </View>
                         <View style={styles.dataInputView}>
                             <Text style={styles.labelText}>PREÇO DO PRODUTO:</Text>
-                            <TextInput
-                                placeholder={'8,00'}
-                                style={styles.inputMensage}
-                                keyboardType='numeric'
-                                onChangeText={setProductPrice}
-                                value={productPrice}        
+                            <FakeCurrencyInput
+                                containerStyle={styles.inputMensage}
+                                value = {productPrice}
+                                onChangeValue = {setProductPrice}
+                                prefix = ""
+                                delimiter = ""
+                                separator = ","
+                                precision = {2}
+                                onChangeText = { formattedValue => {
+                                    console.log(formattedValue);
+                                }}
                             />
+                            
                         </View>
                         <View style={styles.configButtonsView}>
+                           
                             {configButtons.map(({id,textButton,onPress}, index)=>(                            
                                 <TouchableOpacity 
-                                    style={styles.doubleActionButton} 
-                                    key={index}
-                                    onPress={onPress}                                
+                                    style = { ((id === "sendSaleNfce" && !isSendSaleNfceEnabled) ? styles.disabledActionButton : styles.doubleActionButton  )} 
+                                    key = { index }
+                                    onPress = { onPress }
+                                    disabled = { ((id === "sendSaleNfce" && !isSendSaleNfceEnabled) ? true : false) }                                
                                 >
                                 <Text style={styles.buttonText}>{textButton}</Text>
                                 </TouchableOpacity>
@@ -77,29 +156,22 @@ const Nfce =()=> {
                     <View style={styles.infoView}>
                         <View style={styles.returnDataView}>
                             <Text style={styles.labelText}>TEMPO DE EMISSÃO:</Text>
-                            <Text>{emitionTime}</Text>
+                            <Text style = {styles.emittionTimeView}>{emitionTime}</Text>
                         </View>
                         <View style={styles.returnDataView}>
                             <View style={styles.returnDataText}>
                                 <Text style={styles.labelText}>NOTA Nº:</Text>
-                                <Text>{noteNumber}</Text>
+                                <Text style = { styles.noteInfoView} >{noteNumber}</Text>
                             </View>
                             <View style={styles.returnDataText}>
                                 <Text style={styles.labelText}>SÉRIE Nº:</Text>
-                                <Text>{serieNumber}</Text>
+                                <Text style = { styles.noteInfoView }>{serieNumber}</Text>
                             </View>
-                            
                         </View>
                     </View>
-                    <View>
-                        <TouchableOpacity style={styles.configButtons}>
-                            <Text style={styles.buttonText}>CONSULTAR ERRO</Text>
-                        </TouchableOpacity>
-                    </View>
                 </View>
+                <Footer/>
             </View>
-            
-            
         </View>
     );
 };
@@ -110,7 +182,6 @@ const styles = StyleSheet.create(
     mainView:{
       flex:1,
       backgroundColor:'white',
-  
     },
   
     contentView:{
@@ -148,8 +219,6 @@ const styles = StyleSheet.create(
       alignContent:'space-around',
       height:420,
       width:'100%',
-      //backgroundColor:'blue',
-     
     },
 
     configView:{
@@ -176,9 +245,21 @@ const styles = StyleSheet.create(
         borderRadius:15,
         justifyContent:'center',
     },
+    disabledActionButton:{
+        width:'49%',
+        height:45,
+        backgroundColor:'#808080',
+        alignItems:'center',
+        borderRadius:15,
+        justifyContent:'center',
+    },
 
-    infoView:{
-
+    emittionTimeView:{
+        marginRight: 20
+    },
+    
+    noteInfoView : {
+        marginLeft: 10
     },
 
     returnDataView:{
@@ -236,6 +317,7 @@ const styles = StyleSheet.create(
     },
     inputMensage:{
         textAlign: 'center',
+        justifyContent: 'center',
         flexDirection:'row',
         width:'45%',
         borderBottomWidth:1,

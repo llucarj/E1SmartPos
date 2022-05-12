@@ -149,7 +149,11 @@ export default class PrinterService {
     this.sendFunctionToAndroid(mapParam);
   }
 
-  funcaoTest() {
-    NativeModulesE1.funcTest();
+  printerStop(){
+    const mapParam = {
+      typePrinter: 'printerStop',
+    }
+
+    this.sendFunctionToAndroid(mapParam);
   }
 }

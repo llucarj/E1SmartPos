@@ -3,10 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.e1smartpos">
 
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.usb.host" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
       android:name=".MainApplication"

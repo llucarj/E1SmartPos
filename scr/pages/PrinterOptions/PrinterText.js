@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
         alignItems:'center',
     },
     optionText:{
-        fontSize:12,
+        fontSize:10,
         fontWeight:'bold',
         color:'black',
     },
@@ -237,11 +237,8 @@ const styles = StyleSheet.create({
      marginBottom:25,
     },   
     printerSettingsView:{
-     
         width:'90%',
         height:'90%',
-       
-
     },
     mensageView:{
         flexDirection:'row',

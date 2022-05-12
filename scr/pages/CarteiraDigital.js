@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
   textButton: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
   },
 });
 
