@@ -6035,6 +6035,11 @@
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   "version" "17.0.2"
 
+"react-native-currency-input@^1.0.1":
+  "integrity" "sha512-1AbXXMAyNBEV2M0snh6e/B1w+rxRBgu9IARVaeF0tkUuaGX4kl/tQVXzyNa0fV2GX89U8Hyb0HaMvjaIZGniAA=="
+  "resolved" "https://registry.npmjs.org/react-native-currency-input/-/react-native-currency-input-1.0.1.tgz"
+  "version" "1.0.1"
+
 "react-native-dialog@^9.2.0":
   "integrity" "sha512-VXdfo+bAi9ER7+w4aKOWypw8K97C2orvnfnxX4Lup/U8iQB/635V00hgfHEE3s0XScQHftXxm34Fa4iIIjojQA=="
   "resolved" "https://registry.npmjs.org/react-native-dialog/-/react-native-dialog-9.2.0.tgz"
