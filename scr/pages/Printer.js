@@ -20,7 +20,9 @@ const Printer = ({navigation}) => {
 
   const [checked, setChecked] = useState('SMARTPOS');
   const [ipConection, setIpConection] = useState('192.168.0.31:9100');
-  const [isUsingPrinterExtern, setIsUsingPrinterExtern] = useState(false);
+
+  const [selectedPrinterIp, setSelectedPrinterIp] = useState('');
+
   const [printerConectionType, setPrinterConectionType] = useState('intern');
 
   const buttonsPrinter = [
@@ -124,11 +126,19 @@ const Printer = ({navigation}) => {
   }
 
   function changePrinterChoose(value) {
-    if (value === 'I9') {
-      setIsUsingPrinterExtern(true);
-      startConnectPrinterExtern();
+    if (value === 'ip') {
+      Alert.alert(
+        'Impressora Externa IP',
+        'Escolha o modelo da impressora que deseja utilziar',
+        [
+          {text: 'Cancelar', onPress: () => startConnectPrinterIntern()},
+          {text: 'i7', onPress: () => startConnectPrinterIP('i7')},
+          {text: 'i7 Plus', onPress: () => startConnectPrinterIP('i7 Plus')},
+          {text: 'i8', onPress: () => startConnectPrinterIP('i8')},
+          {text: 'i9', onPress: () => startConnectPrinterIP('i9')},
+        ],
+      );
     } else {
-      setIsUsingPrinterExtern(false);
       startConnectPrinterIntern();
     }
   }
@@ -139,16 +149,19 @@ const Printer = ({navigation}) => {
     printerService.sendStartConnectionPrinterIntern();
   }
 
-  function startConnectPrinterExtern() {
+  function startConnectPrinterIP(model) {
     if (ipConection !== '') {
       var ip = ipConection.split(':')[0];
       var port = ipConection.split(':')[1];
 
       if (isIpAdressValid()) {
-        printerService.sendStartConnectionPrinterExtern(ip, parseInt(port));
-        Alert.alert('Retorno', 'Impressora Externa Conectar');
-        setChecked('I9');
-        setPrinterConectionType('extern');
+        printerService.sendStartConnectionPrinterExternIp(
+          model,
+          ip,
+          parseInt(port, 10),
+        );
+        setChecked('ip');
+        setSelectedPrinterIp(model);
       } else {
         Alert.alert('Alert', 'Digíte um endereço e porta IP válido!');
       }
@@ -194,7 +207,9 @@ const Printer = ({navigation}) => {
               status={checked === 'I9' ? 'checked' : 'unchecked'}
               onPress={() => changePrinterChoose('I9')}
             />
-            <Text style={styles.labelText}>IMP. EXTERNA</Text>
+            <Text style={styles.labelText}>
+              IMP. EXTERNA - IP {selectedPrinterIp}
+            </Text>
           </View>
         </View>
         <View style={styles.conectionView}>
@@ -207,6 +222,7 @@ const Printer = ({navigation}) => {
             keyboardType="default"
             autoCorrect={false}
             value={ipConection}
+            onChangeText={setIpConection}
           />
         </View>
         <View style={styles.printerButtonsView}>
